@@ -7,6 +7,7 @@ function qsm_r2s_prisma(path_mag, path_ph, path_out, options)
 %   PATH_MAG     - directory of magnitude dicoms
 %   PATH_PH      - directory of unfiltered phase dicoms
 %   PATH_OUT     - directory to save nifti and/or matrixes   : QSM_SWI_PRISMA
+%
 %   OPTIONS      - parameter structure including fields below
 %    .readout    - multi-echo 'unipolar' or 'bipolar'        : 'unipolar'
 %    .r_mask     - whether to enable the extra masking       : 1
