@@ -5,6 +5,7 @@ function [lfs, mask_ero, res_term, reg_term] = resharp(tfs,mask,vox,ker_rad,tik_
 %   MASK_ERO    : eroded mask after convolution
 %   RES_TERM    : norm of data fidelity term
 %   REG_TERM    : norm of regularization term
+%
 %   TFS         : input total field shift
 %   MASK        : binary mask defining the brain ROI
 %   VOX         : voxel size (mm), e.g. [1,1,1] for isotropic
@@ -12,10 +13,10 @@ function [lfs, mask_ero, res_term, reg_term] = resharp(tfs,mask,vox,ker_rad,tik_
 %   TIK_REG     : Tikhonov regularization parameter, e.g. 1e-4
 %   CGS_NUM     : maximum number of CGS times of iteration, e.g. 200
 %
-%Method is described in the paper:
-%Sun, H. and Wilman, A. H. (2013), 
-%Background field removal using spherical mean value filtering and Tikhonov regularization. 
-%Magn Reson Med. doi: 10.1002/mrm.24765
+% Method is described in the paper:
+% Sun, H. and Wilman, A. H. (2013),
+% Background field removal using spherical mean value filtering and Tikhonov regularization.
+% Magn Reson Med. doi: 10.1002/mrm.24765
 
 if ~ exist('vox','var') || isempty(vox)
     vox = [1,1,1];
@@ -30,7 +31,8 @@ if ~ exist('tik_reg','var') || isempty(tik_reg)
 end
 
 if ~ exist('iter_num','var') || isempty(iter_num)
-    iter_num = 200;
+    % iter_num = 200;
+    iter_num = 10;
 end
 
 
@@ -57,7 +59,7 @@ imsize = size(tfs);
 
 mask_ero = zeros(imsize);
 mask_tmp = convn(mask,ker,'same');
-%mask_ero(mask_tmp > 1-1/sum(h(:))) = 1; % no error points tolerence 
+% mask_ero(mask_tmp > 1-1/sum(h(:))) = 1; % no error points tolerence
 mask_ero(mask_tmp > 0.999999) = 1; % no error points tolerence 
 
 
@@ -110,6 +112,7 @@ function y = Afun(x)
 
     y = y(:);
 end
+
 
 end
 
