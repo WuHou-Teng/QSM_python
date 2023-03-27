@@ -1,5 +1,4 @@
 import numpy as np
-import time
 
 from scipy.io import loadmat, savemat
 from scipy.signal import convolve
@@ -7,7 +6,7 @@ from scipy.signal import convolve
 from scipy.sparse.linalg import cgs, LinearOperator
 
 # 密集矩阵求解
-from scipy.linalg import solve
+from tools.CallBackTools import CallBackTool
 
 
 def resharp(tfs, mask, vox=None, ker_rad=3, tik_reg=1e-4, iter_num=200):
@@ -205,23 +204,6 @@ def circshift(ndarray, shift, axis=None):
     else:
         shift_list = tuple(shift)
     return np.roll(ndarray, shift_list, axis)
-
-
-# 定义一个 callback 函数，用于输出迭代信息
-class CallBackTool(object):
-    def __init__(self):
-        self.current_time = time.process_time()
-        self.iter_num = 1
-
-    def csg_callback_func(self, x):
-        print(f"迭代次数:{self.iter_num}, 剩余残差为: {x}")
-        self.iter_num += 1
-
-    def print_time(self, line):
-        main_time = time.process_time() - self.current_time
-        self.current_time = time.process_time()
-        print(f"程序总耗时:{main_time}秒, 运行到程序第{line}行")
-
 
 
 if __name__ == "__main__":

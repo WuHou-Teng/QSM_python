@@ -24,3 +24,26 @@ def get_cols(table, col_start, col_end=None):
         col_end = col_start + 1
     return table[0:, col_start: col_end]
 
+
+# 计算一元二次方程的解
+def quadratic_equation(a, b, c):
+    if a == 0:
+        return -c / b
+    else:
+        delta = b ** 2 - 4 * a * c
+        if delta >= 0:
+            return (-b + np.sqrt(delta)) / (2 * a), (-b - np.sqrt(delta)) / (2 * a)
+        else:
+            return None, None
+
+
+# 解一次常微分方程
+def solve_ode(f, x0, y0, h, n):
+    x = np.zeros(n)
+    y = np.zeros(n)
+    x[0] = x0
+    y[0] = y0
+    for i in range(n - 1):
+        y[i + 1] = y[i] + h * f(x[i], y[i])
+        x[i + 1] = x[i] + h
+    return x, y
