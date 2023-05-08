@@ -6,19 +6,34 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1171</width>
-    <height>863</height>
+    <width>1159</width>
+    <height>895</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>QSM Master</string>
   </property>
-  <property name="styleSheet">
-   <string notr="true">alternate-background-color: rgb(93, 93, 93);</string>
-  </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="0">
+    <property name="leftMargin">
+     <number>6</number>
+    </property>
+    <property name="topMargin">
+     <number>5</number>
+    </property>
+    <property name="rightMargin">
+     <number>2</number>
+    </property>
+    <property name="bottomMargin">
+     <number>1</number>
+    </property>
+    <property name="horizontalSpacing">
+     <number>10</number>
+    </property>
+    <property name="verticalSpacing">
+     <number>0</number>
+    </property>
+    <item row="0" column="0" rowspan="2">
      <layout class="QVBoxLayout" name="verticalLayout">
       <property name="spacing">
        <number>0</number>
@@ -54,7 +69,7 @@ color: rgb(255, 255, 255);</string>
         <property name="maximumSize">
          <size>
           <width>500</width>
-          <height>1000</height>
+          <height>300</height>
          </size>
         </property>
         <property name="font">
@@ -182,6 +197,16 @@ color: rgb(255, 255, 255);</string>
         </item>
         <item>
          <property name="text">
+          <string>&gt;&gt; Dipole Inversion</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>&gt;&gt; Background Field Remove</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
           <string>&gt;&gt; Other Tools</string>
          </property>
         </item>
@@ -205,48 +230,64 @@ color: rgb(255, 255, 255);</string>
            <attribute name="title">
             <string>Welcome</string>
            </attribute>
-           <layout class="QVBoxLayout" name="verticalLayout_12">
-            <item>
-             <widget class="QLabel" name="label_80">
-              <property name="font">
-               <font>
-                <family>Microsoft YaHei</family>
-                <pointsize>36</pointsize>
-               </font>
-              </property>
-              <property name="text">
-               <string>Wellcome to QSM!</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="label_81">
-              <property name="text">
-               <string>(Will add picture later)</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="label_82">
-              <property name="text">
-               <string>Please set the network first:</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="set_net_btn">
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>111</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>Start Set Network</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
+           <widget class="QPushButton" name="set_net_btn">
+            <property name="geometry">
+             <rect>
+              <x>110</x>
+              <y>640</y>
+              <width>431</width>
+              <height>111</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Start Set Network</string>
+            </property>
+           </widget>
+           <widget class="QLabel" name="label_80">
+            <property name="geometry">
+             <rect>
+              <x>20</x>
+              <y>110</y>
+              <width>661</width>
+              <height>251</height>
+             </rect>
+            </property>
+            <property name="font">
+             <font>
+              <family>Microsoft YaHei</family>
+              <pointsize>36</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>Wellcome to QSM!</string>
+            </property>
+           </widget>
+           <widget class="QLabel" name="label_81">
+            <property name="geometry">
+             <rect>
+              <x>40</x>
+              <y>350</y>
+              <width>221</width>
+              <height>41</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>(Will add picture later)</string>
+            </property>
+           </widget>
+           <widget class="QLabel" name="label_82">
+            <property name="geometry">
+             <rect>
+              <x>50</x>
+              <y>580</y>
+              <width>271</width>
+              <height>18</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Please set the network first:</string>
+            </property>
+           </widget>
           </widget>
           <widget class="QWidget" name="tab_10">
            <attribute name="title">
@@ -431,11 +472,11 @@ color: rgb(255, 255, 255);</string>
            </attribute>
            <layout class="QVBoxLayout" name="verticalLayout_5">
             <item>
-             <widget class="QGroupBox" name="groupBox_22">
+             <widget class="QGroupBox" name="groupBox_24">
               <property name="title">
                <string>Parameters</string>
               </property>
-              <layout class="QFormLayout" name="formLayout_26">
+              <layout class="QFormLayout" name="formLayout_28">
                <item row="0" column="0">
                 <widget class="QPushButton" name="Magnitude_dicoms_btn_5">
                  <property name="minimumSize">
@@ -536,7 +577,7 @@ color: rgb(255, 255, 255);</string>
              </widget>
             </item>
             <item>
-             <widget class="QGroupBox" name="groupBox_23">
+             <widget class="QGroupBox" name="groupBox_22">
               <property name="styleSheet">
                <string notr="true"/>
               </property>
@@ -545,11 +586,11 @@ color: rgb(255, 255, 255);</string>
               </property>
               <layout class="QHBoxLayout" name="horizontalLayout_18">
                <item>
-                <layout class="QFormLayout" name="formLayout_27">
+                <layout class="QFormLayout" name="formLayout_26">
                  <item row="0" column="0">
                   <widget class="QLabel" name="label_83">
                    <property name="enabled">
-                    <bool>false</bool>
+                    <bool>true</bool>
                    </property>
                    <property name="minimumSize">
                     <size>
@@ -561,8 +602,6 @@ color: rgb(255, 255, 255);</string>
                     <font>
                      <family>Microsoft JhengHei UI</family>
                      <pointsize>10</pointsize>
-                     <weight>50</weight>
-                     <bold>false</bold>
                     </font>
                    </property>
                    <property name="layoutDirection">
@@ -579,7 +618,7 @@ color: rgb(255, 255, 255);</string>
                  <item row="0" column="1">
                   <widget class="QComboBox" name="ReadOut_cbox_6">
                    <property name="enabled">
-                    <bool>false</bool>
+                    <bool>true</bool>
                    </property>
                    <property name="minimumSize">
                     <size>
@@ -603,7 +642,7 @@ color: rgb(255, 255, 255);</string>
                  <item row="1" column="0">
                   <widget class="QLabel" name="label_84">
                    <property name="enabled">
-                    <bool>false</bool>
+                    <bool>true</bool>
                    </property>
                    <property name="minimumSize">
                     <size>
@@ -615,8 +654,6 @@ color: rgb(255, 255, 255);</string>
                     <font>
                      <family>Microsoft JhengHei UI</family>
                      <pointsize>10</pointsize>
-                     <weight>50</weight>
-                     <bold>false</bold>
                     </font>
                    </property>
                    <property name="layoutDirection">
@@ -633,7 +670,7 @@ color: rgb(255, 255, 255);</string>
                  <item row="1" column="1">
                   <widget class="QComboBox" name="RMask_cbox_6">
                    <property name="enabled">
-                    <bool>false</bool>
+                    <bool>true</bool>
                    </property>
                    <property name="minimumSize">
                     <size>
@@ -662,7 +699,7 @@ color: rgb(255, 255, 255);</string>
                  <item row="2" column="0">
                   <widget class="QLabel" name="label_85">
                    <property name="enabled">
-                    <bool>false</bool>
+                    <bool>true</bool>
                    </property>
                    <property name="minimumSize">
                     <size>
@@ -674,8 +711,6 @@ color: rgb(255, 255, 255);</string>
                     <font>
                      <family>Microsoft JhengHei UI</family>
                      <pointsize>10</pointsize>
-                     <weight>50</weight>
-                     <bold>false</bold>
                     </font>
                    </property>
                    <property name="layoutDirection">
@@ -692,7 +727,7 @@ color: rgb(255, 255, 255);</string>
                  <item row="2" column="1">
                   <widget class="QLineEdit" name="FitThr_ledit_6">
                    <property name="enabled">
-                    <bool>false</bool>
+                    <bool>true</bool>
                    </property>
                    <property name="minimumSize">
                     <size>
@@ -721,7 +756,7 @@ color: rgb(255, 255, 255);</string>
                 </widget>
                </item>
                <item>
-                <layout class="QFormLayout" name="formLayout_28">
+                <layout class="QFormLayout" name="formLayout_27">
                  <item row="0" column="0">
                   <widget class="QLabel" name="label_86">
                    <property name="minimumSize">
@@ -734,8 +769,6 @@ color: rgb(255, 255, 255);</string>
                     <font>
                      <family>Microsoft JhengHei UI</family>
                      <pointsize>10</pointsize>
-                     <weight>50</weight>
-                     <bold>false</bold>
                     </font>
                    </property>
                    <property name="toolTip">
@@ -783,8 +816,6 @@ color: rgb(255, 255, 255);</string>
                     <font>
                      <family>Microsoft JhengHei UI</family>
                      <pointsize>10</pointsize>
-                     <weight>50</weight>
-                     <bold>false</bold>
                     </font>
                    </property>
                    <property name="layoutDirection">
@@ -829,8 +860,6 @@ color: rgb(255, 255, 255);</string>
                     <font>
                      <family>Microsoft JhengHei UI</family>
                      <pointsize>10</pointsize>
-                     <weight>50</weight>
-                     <bold>false</bold>
                     </font>
                    </property>
                    <property name="layoutDirection">
@@ -876,15 +905,15 @@ color: rgb(255, 255, 255);</string>
              </widget>
             </item>
             <item>
-             <widget class="QGroupBox" name="groupBox_24">
+             <widget class="QGroupBox" name="groupBox_25">
               <property name="title">
                <string>Image Setting</string>
               </property>
-              <layout class="QHBoxLayout" name="horizontalLayout_21">
+              <layout class="QHBoxLayout" name="horizontalLayout_22">
                <item>
                 <layout class="QFormLayout" name="formLayout_29">
                  <item row="0" column="0">
-                  <widget class="QLabel" name="label_89">
+                  <widget class="QLabel" name="label_90">
                    <property name="minimumSize">
                     <size>
                      <width>0</width>
@@ -895,8 +924,6 @@ color: rgb(255, 255, 255);</string>
                     <font>
                      <family>Microsoft JhengHei UI</family>
                      <pointsize>10</pointsize>
-                     <weight>50</weight>
-                     <bold>false</bold>
                     </font>
                    </property>
                    <property name="layoutDirection">
@@ -930,7 +957,7 @@ color: rgb(255, 255, 255);</string>
                   </widget>
                  </item>
                  <item row="1" column="0">
-                  <widget class="QLabel" name="label_90">
+                  <widget class="QLabel" name="label_91">
                    <property name="minimumSize">
                     <size>
                      <width>0</width>
@@ -941,8 +968,6 @@ color: rgb(255, 255, 255);</string>
                     <font>
                      <family>Microsoft JhengHei UI</family>
                      <pointsize>10</pointsize>
-                     <weight>50</weight>
-                     <bold>false</bold>
                     </font>
                    </property>
                    <property name="styleSheet">
@@ -973,7 +998,7 @@ color: rgb(255, 255, 255);</string>
                   </widget>
                  </item>
                  <item row="2" column="0">
-                  <widget class="QLabel" name="label_91">
+                  <widget class="QLabel" name="label_92">
                    <property name="minimumSize">
                     <size>
                      <width>0</width>
@@ -984,8 +1009,6 @@ color: rgb(255, 255, 255);</string>
                     <font>
                      <family>Microsoft JhengHei UI</family>
                      <pointsize>10</pointsize>
-                     <weight>50</weight>
-                     <bold>false</bold>
                     </font>
                    </property>
                    <property name="styleSheet">
@@ -1016,7 +1039,7 @@ color: rgb(255, 255, 255);</string>
                   </widget>
                  </item>
                  <item row="3" column="0">
-                  <widget class="QLabel" name="label_92">
+                  <widget class="QLabel" name="label_93">
                    <property name="minimumSize">
                     <size>
                      <width>0</width>
@@ -1027,8 +1050,6 @@ color: rgb(255, 255, 255);</string>
                     <font>
                      <family>Microsoft JhengHei UI</family>
                      <pointsize>10</pointsize>
-                     <weight>50</weight>
-                     <bold>false</bold>
                     </font>
                    </property>
                    <property name="styleSheet">
@@ -1070,30 +1091,6 @@ color: rgb(255, 255, 255);</string>
                <item>
                 <layout class="QFormLayout" name="formLayout_30">
                  <item row="0" column="0">
-                  <widget class="QLabel" name="label_93">
-                   <property name="minimumSize">
-                    <size>
-                     <width>0</width>
-                     <height>30</height>
-                    </size>
-                   </property>
-                   <property name="font">
-                    <font>
-                     <family>Microsoft JhengHei UI</family>
-                     <pointsize>10</pointsize>
-                     <weight>50</weight>
-                     <bold>false</bold>
-                    </font>
-                   </property>
-                   <property name="styleSheet">
-                    <string notr="true"/>
-                   </property>
-                   <property name="text">
-                    <string>Ibv_peel</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="0">
                   <widget class="QLabel" name="label_94">
                    <property name="minimumSize">
                     <size>
@@ -1105,19 +1102,17 @@ color: rgb(255, 255, 255);</string>
                     <font>
                      <family>Microsoft JhengHei UI</family>
                      <pointsize>10</pointsize>
-                     <weight>50</weight>
-                     <bold>false</bold>
                     </font>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
                    </property>
                    <property name="text">
-                    <string>Tv_reg</string>
+                    <string>Ibv_peel</string>
                    </property>
                   </widget>
                  </item>
-                 <item row="2" column="0">
+                 <item row="1" column="0">
                   <widget class="QLabel" name="label_95">
                    <property name="minimumSize">
                     <size>
@@ -1129,19 +1124,17 @@ color: rgb(255, 255, 255);</string>
                     <font>
                      <family>Microsoft JhengHei UI</family>
                      <pointsize>10</pointsize>
-                     <weight>50</weight>
-                     <bold>false</bold>
                     </font>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
                    </property>
                    <property name="text">
-                    <string>Ibv_tol</string>
+                    <string>Tv_reg</string>
                    </property>
                   </widget>
                  </item>
-                 <item row="3" column="0">
+                 <item row="2" column="0">
                   <widget class="QLabel" name="label_96">
                    <property name="minimumSize">
                     <size>
@@ -1153,8 +1146,28 @@ color: rgb(255, 255, 255);</string>
                     <font>
                      <family>Microsoft JhengHei UI</family>
                      <pointsize>10</pointsize>
-                     <weight>50</weight>
-                     <bold>false</bold>
+                    </font>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true"/>
+                   </property>
+                   <property name="text">
+                    <string>Ibv_tol</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="3" column="0">
+                  <widget class="QLabel" name="label_97">
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>30</height>
+                    </size>
+                   </property>
+                   <property name="font">
+                    <font>
+                     <family>Microsoft JhengHei UI</family>
+                     <pointsize>10</pointsize>
                     </font>
                    </property>
                    <property name="styleSheet">
@@ -1247,31 +1260,23 @@ color: rgb(255, 255, 255);</string>
              </widget>
             </item>
             <item>
-             <widget class="QGroupBox" name="groupBox_25">
+             <widget class="QGroupBox" name="groupBox_23">
               <property name="title">
                <string>Method</string>
               </property>
-              <layout class="QHBoxLayout" name="horizontalLayout_22">
-               <item>
-                <widget class="QLabel" name="label_97">
+              <layout class="QHBoxLayout" name="horizontalLayout_21">
+               <item alignment="Qt::AlignHCenter">
+                <widget class="QLabel" name="label_89">
                  <property name="minimumSize">
                   <size>
                    <width>0</width>
                    <height>30</height>
                   </size>
                  </property>
-                 <property name="maximumSize">
-                  <size>
-                   <width>60</width>
-                   <height>16777215</height>
-                  </size>
-                 </property>
                  <property name="font">
                   <font>
                    <family>Microsoft JhengHei UI</family>
                    <pointsize>10</pointsize>
-                   <weight>50</weight>
-                   <bold>false</bold>
                   </font>
                  </property>
                  <property name="layoutDirection">
@@ -1480,8 +1485,6 @@ color: rgb(255, 255, 255);</string>
                     <font>
                      <family>Microsoft JhengHei UI</family>
                      <pointsize>10</pointsize>
-                     <weight>50</weight>
-                     <bold>false</bold>
                     </font>
                    </property>
                    <property name="layoutDirection">
@@ -1534,8 +1537,6 @@ color: rgb(255, 255, 255);</string>
                     <font>
                      <family>Microsoft JhengHei UI</family>
                      <pointsize>10</pointsize>
-                     <weight>50</weight>
-                     <bold>false</bold>
                     </font>
                    </property>
                    <property name="layoutDirection">
@@ -1593,8 +1594,6 @@ color: rgb(255, 255, 255);</string>
                     <font>
                      <family>Microsoft JhengHei UI</family>
                      <pointsize>10</pointsize>
-                     <weight>50</weight>
-                     <bold>false</bold>
                     </font>
                    </property>
                    <property name="layoutDirection">
@@ -1653,8 +1652,6 @@ color: rgb(255, 255, 255);</string>
                     <font>
                      <family>Microsoft JhengHei UI</family>
                      <pointsize>10</pointsize>
-                     <weight>50</weight>
-                     <bold>false</bold>
                     </font>
                    </property>
                    <property name="toolTip">
@@ -1702,8 +1699,6 @@ color: rgb(255, 255, 255);</string>
                     <font>
                      <family>Microsoft JhengHei UI</family>
                      <pointsize>10</pointsize>
-                     <weight>50</weight>
-                     <bold>false</bold>
                     </font>
                    </property>
                    <property name="layoutDirection">
@@ -1748,8 +1743,6 @@ color: rgb(255, 255, 255);</string>
                     <font>
                      <family>Microsoft JhengHei UI</family>
                      <pointsize>10</pointsize>
-                     <weight>50</weight>
-                     <bold>false</bold>
                     </font>
                    </property>
                    <property name="layoutDirection">
@@ -1814,8 +1807,6 @@ color: rgb(255, 255, 255);</string>
                     <font>
                      <family>Microsoft JhengHei UI</family>
                      <pointsize>10</pointsize>
-                     <weight>50</weight>
-                     <bold>false</bold>
                     </font>
                    </property>
                    <property name="layoutDirection">
@@ -1860,8 +1851,6 @@ color: rgb(255, 255, 255);</string>
                     <font>
                      <family>Microsoft JhengHei UI</family>
                      <pointsize>10</pointsize>
-                     <weight>50</weight>
-                     <bold>false</bold>
                     </font>
                    </property>
                    <property name="styleSheet">
@@ -1903,8 +1892,6 @@ color: rgb(255, 255, 255);</string>
                     <font>
                      <family>Microsoft JhengHei UI</family>
                      <pointsize>10</pointsize>
-                     <weight>50</weight>
-                     <bold>false</bold>
                     </font>
                    </property>
                    <property name="styleSheet">
@@ -1946,8 +1933,6 @@ color: rgb(255, 255, 255);</string>
                     <font>
                      <family>Microsoft JhengHei UI</family>
                      <pointsize>10</pointsize>
-                     <weight>50</weight>
-                     <bold>false</bold>
                     </font>
                    </property>
                    <property name="styleSheet">
@@ -2000,8 +1985,6 @@ color: rgb(255, 255, 255);</string>
                     <font>
                      <family>Microsoft JhengHei UI</family>
                      <pointsize>10</pointsize>
-                     <weight>50</weight>
-                     <bold>false</bold>
                     </font>
                    </property>
                    <property name="styleSheet">
@@ -2024,8 +2007,6 @@ color: rgb(255, 255, 255);</string>
                     <font>
                      <family>Microsoft JhengHei UI</family>
                      <pointsize>10</pointsize>
-                     <weight>50</weight>
-                     <bold>false</bold>
                     </font>
                    </property>
                    <property name="styleSheet">
@@ -2048,8 +2029,6 @@ color: rgb(255, 255, 255);</string>
                     <font>
                      <family>Microsoft JhengHei UI</family>
                      <pointsize>10</pointsize>
-                     <weight>50</weight>
-                     <bold>false</bold>
                     </font>
                    </property>
                    <property name="styleSheet">
@@ -2072,8 +2051,6 @@ color: rgb(255, 255, 255);</string>
                     <font>
                      <family>Microsoft JhengHei UI</family>
                      <pointsize>10</pointsize>
-                     <weight>50</weight>
-                     <bold>false</bold>
                     </font>
                    </property>
                    <property name="styleSheet">
@@ -2170,8 +2147,8 @@ color: rgb(255, 255, 255);</string>
               <property name="title">
                <string>Method</string>
               </property>
-              <layout class="QHBoxLayout" name="horizontalLayout">
-               <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_10">
+               <item alignment="Qt::AlignHCenter">
                 <widget class="QLabel" name="label_47">
                  <property name="minimumSize">
                   <size>
@@ -2179,18 +2156,10 @@ color: rgb(255, 255, 255);</string>
                    <height>30</height>
                   </size>
                  </property>
-                 <property name="maximumSize">
-                  <size>
-                   <width>60</width>
-                   <height>16777215</height>
-                  </size>
-                 </property>
                  <property name="font">
                   <font>
                    <family>Microsoft JhengHei UI</family>
                    <pointsize>10</pointsize>
-                   <weight>50</weight>
-                   <bold>false</bold>
                   </font>
                  </property>
                  <property name="layoutDirection">
@@ -2396,8 +2365,6 @@ color: rgb(255, 255, 255);</string>
                     <font>
                      <family>Microsoft JhengHei UI</family>
                      <pointsize>10</pointsize>
-                     <weight>50</weight>
-                     <bold>false</bold>
                     </font>
                    </property>
                    <property name="layoutDirection">
@@ -2444,8 +2411,6 @@ color: rgb(255, 255, 255);</string>
                     <font>
                      <family>Microsoft JhengHei UI</family>
                      <pointsize>10</pointsize>
-                     <weight>50</weight>
-                     <bold>false</bold>
                     </font>
                    </property>
                    <property name="layoutDirection">
@@ -2497,8 +2462,6 @@ color: rgb(255, 255, 255);</string>
                     <font>
                      <family>Microsoft JhengHei UI</family>
                      <pointsize>10</pointsize>
-                     <weight>50</weight>
-                     <bold>false</bold>
                     </font>
                    </property>
                    <property name="layoutDirection">
@@ -2554,8 +2517,6 @@ color: rgb(255, 255, 255);</string>
                     <font>
                      <family>Microsoft JhengHei UI</family>
                      <pointsize>10</pointsize>
-                     <weight>50</weight>
-                     <bold>false</bold>
                     </font>
                    </property>
                    <property name="toolTip">
@@ -2603,8 +2564,6 @@ color: rgb(255, 255, 255);</string>
                     <font>
                      <family>Microsoft JhengHei UI</family>
                      <pointsize>10</pointsize>
-                     <weight>50</weight>
-                     <bold>false</bold>
                     </font>
                    </property>
                    <property name="layoutDirection">
@@ -2649,8 +2608,6 @@ color: rgb(255, 255, 255);</string>
                     <font>
                      <family>Microsoft JhengHei UI</family>
                      <pointsize>10</pointsize>
-                     <weight>50</weight>
-                     <bold>false</bold>
                     </font>
                    </property>
                    <property name="layoutDirection">
@@ -2715,8 +2672,6 @@ color: rgb(255, 255, 255);</string>
                     <font>
                      <family>Microsoft JhengHei UI</family>
                      <pointsize>10</pointsize>
-                     <weight>50</weight>
-                     <bold>false</bold>
                     </font>
                    </property>
                    <property name="layoutDirection">
@@ -2761,8 +2716,6 @@ color: rgb(255, 255, 255);</string>
                     <font>
                      <family>Microsoft JhengHei UI</family>
                      <pointsize>10</pointsize>
-                     <weight>50</weight>
-                     <bold>false</bold>
                     </font>
                    </property>
                    <property name="styleSheet">
@@ -2804,8 +2757,6 @@ color: rgb(255, 255, 255);</string>
                     <font>
                      <family>Microsoft JhengHei UI</family>
                      <pointsize>10</pointsize>
-                     <weight>50</weight>
-                     <bold>false</bold>
                     </font>
                    </property>
                    <property name="styleSheet">
@@ -2847,8 +2798,6 @@ color: rgb(255, 255, 255);</string>
                     <font>
                      <family>Microsoft JhengHei UI</family>
                      <pointsize>10</pointsize>
-                     <weight>50</weight>
-                     <bold>false</bold>
                     </font>
                    </property>
                    <property name="styleSheet">
@@ -2901,8 +2850,6 @@ color: rgb(255, 255, 255);</string>
                     <font>
                      <family>Microsoft JhengHei UI</family>
                      <pointsize>10</pointsize>
-                     <weight>50</weight>
-                     <bold>false</bold>
                     </font>
                    </property>
                    <property name="styleSheet">
@@ -2925,8 +2872,6 @@ color: rgb(255, 255, 255);</string>
                     <font>
                      <family>Microsoft JhengHei UI</family>
                      <pointsize>10</pointsize>
-                     <weight>50</weight>
-                     <bold>false</bold>
                     </font>
                    </property>
                    <property name="styleSheet">
@@ -2949,8 +2894,6 @@ color: rgb(255, 255, 255);</string>
                     <font>
                      <family>Microsoft JhengHei UI</family>
                      <pointsize>10</pointsize>
-                     <weight>50</weight>
-                     <bold>false</bold>
                     </font>
                    </property>
                    <property name="styleSheet">
@@ -2973,8 +2916,6 @@ color: rgb(255, 255, 255);</string>
                     <font>
                      <family>Microsoft JhengHei UI</family>
                      <pointsize>10</pointsize>
-                     <weight>50</weight>
-                     <bold>false</bold>
                     </font>
                    </property>
                    <property name="styleSheet">
@@ -3072,7 +3013,7 @@ color: rgb(255, 255, 255);</string>
                <string>Method</string>
               </property>
               <layout class="QHBoxLayout" name="horizontalLayout_13">
-               <item>
+               <item alignment="Qt::AlignHCenter">
                 <widget class="QLabel" name="label_62">
                  <property name="minimumSize">
                   <size>
@@ -3080,18 +3021,10 @@ color: rgb(255, 255, 255);</string>
                    <height>30</height>
                   </size>
                  </property>
-                 <property name="maximumSize">
-                  <size>
-                   <width>60</width>
-                   <height>16777215</height>
-                  </size>
-                 </property>
                  <property name="font">
                   <font>
                    <family>Microsoft JhengHei UI</family>
                    <pointsize>10</pointsize>
-                   <weight>50</weight>
-                   <bold>false</bold>
                   </font>
                  </property>
                  <property name="layoutDirection">
@@ -3300,8 +3233,6 @@ color: rgb(255, 255, 255);</string>
                     <font>
                      <family>Microsoft JhengHei UI</family>
                      <pointsize>10</pointsize>
-                     <weight>50</weight>
-                     <bold>false</bold>
                     </font>
                    </property>
                    <property name="layoutDirection">
@@ -3354,8 +3285,6 @@ color: rgb(255, 255, 255);</string>
                     <font>
                      <family>Microsoft JhengHei UI</family>
                      <pointsize>10</pointsize>
-                     <weight>50</weight>
-                     <bold>false</bold>
                     </font>
                    </property>
                    <property name="layoutDirection">
@@ -3413,8 +3342,6 @@ color: rgb(255, 255, 255);</string>
                     <font>
                      <family>Microsoft JhengHei UI</family>
                      <pointsize>10</pointsize>
-                     <weight>50</weight>
-                     <bold>false</bold>
                     </font>
                    </property>
                    <property name="layoutDirection">
@@ -3473,8 +3400,6 @@ color: rgb(255, 255, 255);</string>
                     <font>
                      <family>Microsoft JhengHei UI</family>
                      <pointsize>10</pointsize>
-                     <weight>50</weight>
-                     <bold>false</bold>
                     </font>
                    </property>
                    <property name="toolTip">
@@ -3522,8 +3447,6 @@ color: rgb(255, 255, 255);</string>
                     <font>
                      <family>Microsoft JhengHei UI</family>
                      <pointsize>10</pointsize>
-                     <weight>50</weight>
-                     <bold>false</bold>
                     </font>
                    </property>
                    <property name="layoutDirection">
@@ -3568,8 +3491,6 @@ color: rgb(255, 255, 255);</string>
                     <font>
                      <family>Microsoft JhengHei UI</family>
                      <pointsize>10</pointsize>
-                     <weight>50</weight>
-                     <bold>false</bold>
                     </font>
                    </property>
                    <property name="layoutDirection">
@@ -3634,8 +3555,6 @@ color: rgb(255, 255, 255);</string>
                     <font>
                      <family>Microsoft JhengHei UI</family>
                      <pointsize>10</pointsize>
-                     <weight>50</weight>
-                     <bold>false</bold>
                     </font>
                    </property>
                    <property name="layoutDirection">
@@ -3680,8 +3599,6 @@ color: rgb(255, 255, 255);</string>
                     <font>
                      <family>Microsoft JhengHei UI</family>
                      <pointsize>10</pointsize>
-                     <weight>50</weight>
-                     <bold>false</bold>
                     </font>
                    </property>
                    <property name="styleSheet">
@@ -3723,8 +3640,6 @@ color: rgb(255, 255, 255);</string>
                     <font>
                      <family>Microsoft JhengHei UI</family>
                      <pointsize>10</pointsize>
-                     <weight>50</weight>
-                     <bold>false</bold>
                     </font>
                    </property>
                    <property name="styleSheet">
@@ -3766,8 +3681,6 @@ color: rgb(255, 255, 255);</string>
                     <font>
                      <family>Microsoft JhengHei UI</family>
                      <pointsize>10</pointsize>
-                     <weight>50</weight>
-                     <bold>false</bold>
                     </font>
                    </property>
                    <property name="styleSheet">
@@ -3820,8 +3733,6 @@ color: rgb(255, 255, 255);</string>
                     <font>
                      <family>Microsoft JhengHei UI</family>
                      <pointsize>10</pointsize>
-                     <weight>50</weight>
-                     <bold>false</bold>
                     </font>
                    </property>
                    <property name="styleSheet">
@@ -3844,8 +3755,6 @@ color: rgb(255, 255, 255);</string>
                     <font>
                      <family>Microsoft JhengHei UI</family>
                      <pointsize>10</pointsize>
-                     <weight>50</weight>
-                     <bold>false</bold>
                     </font>
                    </property>
                    <property name="styleSheet">
@@ -3868,8 +3777,6 @@ color: rgb(255, 255, 255);</string>
                     <font>
                      <family>Microsoft JhengHei UI</family>
                      <pointsize>10</pointsize>
-                     <weight>50</weight>
-                     <bold>false</bold>
                     </font>
                    </property>
                    <property name="styleSheet">
@@ -3892,8 +3799,6 @@ color: rgb(255, 255, 255);</string>
                     <font>
                      <family>Microsoft JhengHei UI</family>
                      <pointsize>10</pointsize>
-                     <weight>50</weight>
-                     <bold>false</bold>
                     </font>
                    </property>
                    <property name="styleSheet">
@@ -3991,7 +3896,7 @@ color: rgb(255, 255, 255);</string>
                <string>Method</string>
               </property>
               <layout class="QHBoxLayout" name="horizontalLayout_14">
-               <item>
+               <item alignment="Qt::AlignHCenter">
                 <widget class="QLabel" name="label_63">
                  <property name="minimumSize">
                   <size>
@@ -3999,18 +3904,10 @@ color: rgb(255, 255, 255);</string>
                    <height>30</height>
                   </size>
                  </property>
-                 <property name="maximumSize">
-                  <size>
-                   <width>60</width>
-                   <height>16777215</height>
-                  </size>
-                 </property>
                  <property name="font">
                   <font>
                    <family>Microsoft JhengHei UI</family>
                    <pointsize>10</pointsize>
-                   <weight>50</weight>
-                   <bold>false</bold>
                   </font>
                  </property>
                  <property name="layoutDirection">
@@ -4190,6 +4087,37 @@ color: rgb(255, 255, 255);</string>
       </widget>
       <widget class="QWidget" name="Siemens7T_P"/>
       <widget class="QWidget" name="Varia4p7T_P"/>
+      <widget class="QWidget" name="VisualizationTool">
+       <widget class="QGroupBox" name="groupBox">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>20</y>
+          <width>641</width>
+          <height>161</height>
+         </rect>
+        </property>
+        <property name="title">
+         <string>ImageJ</string>
+        </property>
+        <widget class="QPushButton" name="ImageJ_btn">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>40</y>
+           <width>621</width>
+           <height>91</height>
+          </rect>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">border-image: url(:/ToolsImg/ImageJ.png);</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </widget>
+      </widget>
      </widget>
     </item>
    </layout>
@@ -4199,8 +4127,8 @@ color: rgb(255, 255, 255);</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1171</width>
-     <height>23</height>
+     <width>1159</width>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuMenu">
@@ -4225,61 +4153,36 @@ color: rgb(255, 255, 255);</string>
    <addaction name="menuParameter"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <widget class="QDockWidget" name="dockWidget">
+  <widget class="QDockWidget" name="File_browser_dock">
+   <property name="minimumSize">
+    <size>
+     <width>200</width>
+     <height>376</height>
+    </size>
+   </property>
    <property name="windowTitle">
-    <string>File_Browser</string>
+    <string>File Browser</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>2</number>
    </attribute>
-   <widget class="QWidget" name="dockWidgetContents_2">
-    <layout class="QVBoxLayout" name="verticalLayout_11">
+   <widget class="QWidget" name="dockWidgetContents_4">
+    <layout class="QVBoxLayout" name="verticalLayout_9">
      <property name="leftMargin">
-      <number>5</number>
+      <number>0</number>
      </property>
      <property name="topMargin">
-      <number>5</number>
+      <number>0</number>
      </property>
      <property name="rightMargin">
-      <number>5</number>
+      <number>3</number>
      </property>
      <property name="bottomMargin">
-      <number>5</number>
+      <number>0</number>
      </property>
      <item>
-      <widget class="QTreeView" name="FileBrowser_tree_2">
-       <property name="minimumSize">
-        <size>
-         <width>234</width>
-         <height>0</height>
-        </size>
-       </property>
-      </widget>
+      <widget class="QTreeView" name="FileBrowser_tree"/>
      </item>
-    </layout>
-   </widget>
-  </widget>
-  <widget class="QDockWidget" name="dockWidget_2">
-   <property name="windowTitle">
-    <string>Output_Board</string>
-   </property>
-   <attribute name="dockWidgetArea">
-    <number>2</number>
-   </attribute>
-   <widget class="QWidget" name="dockWidgetContents_3">
-    <layout class="QVBoxLayout" name="verticalLayout_10">
-     <property name="leftMargin">
-      <number>5</number>
-     </property>
-     <property name="topMargin">
-      <number>5</number>
-     </property>
-     <property name="rightMargin">
-      <number>5</number>
-     </property>
-     <property name="bottomMargin">
-      <number>5</number>
-     </property>
      <item>
       <widget class="QTabWidget" name="Terminal_bro_2">
        <property name="minimumSize">
@@ -4310,19 +4213,13 @@ color: rgb(255, 255, 255);</string>
          </property>
          <item>
           <widget class="QTextBrowser" name="Feedback_bro_3">
-           <property name="minimumSize">
-            <size>
-             <width>230</width>
-             <height>0</height>
-            </size>
-           </property>
            <property name="html">
             <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans Serif'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun';&quot;&gt;&amp;gt;&amp;gt; Welcome!&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun';&quot;&gt;&amp;gt;&amp;gt; Processing Client(1) Siemens3T_SWI (0%)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:7.8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun'; font-size:9pt;&quot;&gt;&amp;gt;&amp;gt; Welcome!&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun'; font-size:9pt;&quot;&gt;&amp;gt;&amp;gt; Processing Client(1) Siemens3T_SWI (0%)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
           </widget>
          </item>
@@ -4351,10 +4248,10 @@ p, li { white-space: pre-wrap; }
             <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans Serif'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun';&quot;&gt;&amp;gt;&amp;gt;No Network connected&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun';&quot;&gt;&amp;gt;&amp;gt;Servers Started on Portal 172.16.7.226:8080.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun';&quot;&gt;&amp;gt;&amp;gt;Client[1] Connected&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:7.8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun'; font-size:9pt;&quot;&gt;&amp;gt;&amp;gt;No Network connected&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun'; font-size:9pt;&quot;&gt;&amp;gt;&amp;gt;Servers Started on Portal 172.16.7.226:8080.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun'; font-size:9pt;&quot;&gt;&amp;gt;&amp;gt;Client[1] Connected&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
           </widget>
          </item>
@@ -4383,8 +4280,8 @@ p, li { white-space: pre-wrap; }
             <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans Serif'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun';&quot;&gt;&amp;gt;_&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:7.8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun'; font-size:9pt;&quot;&gt;&amp;gt;_&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
           </widget>
          </item>
@@ -4406,7 +4303,9 @@ p, li { white-space: pre-wrap; }
    </property>
   </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="Source/images.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>Data_source_selection</sender>

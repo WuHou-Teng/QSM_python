@@ -5,6 +5,7 @@ from scipy.signal import convolve
 # 稀疏矩阵求解
 from scipy.sparse.linalg import cgs, LinearOperator
 
+from Transfer_Tools.numpy_over_write import padarray, circshift, nd_grid, ma_range
 # 密集矩阵求解
 from tools.CallBackTools import CallBackTool
 
@@ -30,9 +31,9 @@ def resharp(tfs, mask, vox=None, ker_rad=3, tik_reg=1e-4, iter_num=200):
         REG_TERM    : norm of regularization term
     """
 
-    # FIXME 设定一个监控
+    # 设定一个监控
     callback = CallBackTool()
-    callback.print_time(36)
+    callback.print_time_line(36)
 
     if vox is None:
         vox = np.array([1, 1, 1])
@@ -47,9 +48,13 @@ def resharp(tfs, mask, vox=None, ker_rad=3, tik_reg=1e-4, iter_num=200):
     # rz = ceil(ker_rad/vox(3));
     # TODO 关于 ndgrid, 三维的矩阵需要将输出x移动到最后才能保证和matlab相同。
     # [X, Y, Z] = ndgrid(-rx:rx, -ry: ry, -rz: rz)
-    Y, Z, X = np.meshgrid(np.arange(-rx, rx + 1),
-                          np.arange(-ry, ry + 1),
-                          np.arange(-rz, rz + 1))
+    # Y, Z, X = np.meshgrid(np.arange(-rx, rx + 1),
+    #                       np.arange(-ry, ry + 1),
+    #                       np.arange(-rz, rz + 1))
+    X, Y, Z = nd_grid(ma_range(-rx, rx),
+                      ma_range(-ry, ry),
+                      ma_range(-rz, rz))
+
     # 矩阵计算
     # 矩阵乘法 np.dot()
     # 矩阵幂运算 np.power()
@@ -137,9 +142,9 @@ def resharp(tfs, mask, vox=None, ker_rad=3, tik_reg=1e-4, iter_num=200):
     # TODO csg 迭代。
     A = LinearOperator((b.size, b.size), Afun)
     tol = 1e-6
-    callback.print_time(141)
+    callback.print_time_line(141)
     m, info = cgs(A, b, tol=tol, maxiter=iter_num, callback=callback.csg_callback_func)
-    callback.print_time(143)
+    callback.print_time_line(143)
     if info > 1e-6:
         print(f"cgs 在迭代 {iter_num} 停止，而没有收敛到所需容差 {tol}，"
               f"这是因为已达到最大迭代数。迭代返回的 (数目 {iter_num}) 的相对残差为 {info}。")
@@ -165,49 +170,12 @@ def resharp(tfs, mask, vox=None, ker_rad=3, tik_reg=1e-4, iter_num=200):
     print("resharp 函数结束。")
     # img = nibabel.Nifti1Image(lfs, 0)
     # nibabel.save(img, "lfs")
-    savemat("lfs.mat", {"lfs": lfs})
+    savemat("./Source_and_output/lfs.mat", {"lfs": lfs})
     return [lfs, mask_ero, res_term, reg_term]
 
 
-def padarray(ndarray, pad_shape, value=0) -> np.array:
-    """
-    对 matlab 函数 padarray的重写。用来方便重构代码。
-    :param ndarray: 要pad的数组
-    :param pad_shape: 要往数组
-    :param value:
-    :return:
-    """
-    # 首先获取array的shape
-    dimension = ndarray.shape
-    pad = []
-    for i in range(len(dimension)):
-        if type(pad_shape) is list:
-            pad.append([int(pad_shape[i]), int(pad_shape[i])])
-        else:
-            # 不是list，那就必须是 ndarray
-            if len(pad_shape.shape) == 1:
-                pad.append([int(pad_shape[i]), int(pad_shape[i])])
-            elif len(pad_shape.shape) == 2:
-                pad.append([int(pad_shape[0, i]), int(pad_shape[0, i])])
-    return np.pad(ndarray, pad, mode='constant', constant_values=value)
-
-
-def circshift(ndarray, shift, axis=None):
-    if type(shift) is not list and tuple(shift):
-        # shift 可能是个numpy数组
-        shift_list = []
-        try:
-            for index in np.ndindex(shift.shape):
-                shift_list.append(int(shift[index]))
-        except:
-            print("未知的shift")
-    else:
-        shift_list = tuple(shift)
-    return np.roll(ndarray, shift_list, axis)
-
-
 if __name__ == "__main__":
-    tfs_and_mask = loadmat("./tfs_and_mask.mat")  # scipy.io.loadmat
+    tfs_and_mask = loadmat("./Source_and_output/tfs_and_mask.mat")  # scipy.io.loadmat
     # TODO 这里得在外面套一个array转换
     tfs = np.array(tfs_and_mask.get("tfs"))
     mask = np.array(tfs_and_mask.get("mask"))

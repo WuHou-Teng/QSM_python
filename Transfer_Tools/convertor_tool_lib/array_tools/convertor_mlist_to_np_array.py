@@ -48,8 +48,12 @@ class NpArrayTransfer(ToolBaseClass):
                         array_str_elements = array_str_clear_outer_sign.rstrip().strip(';').split(';')
                         # print(array_str_clear_outer_sign)
                         # result_line.clear()
+                        # 这里考虑三种可能，一个是 "1 2 3", 一种是 "1, 2, 3"，一种是 "1,2,3"
                         for element in array_str_elements:
-                            sa = element.split(' ')
+                            if "," in element:
+                                sa = element.split(',')
+                            else:
+                                sa = element.split(' ')
                             jo = ', '.join(sa)
                             jo = '[' + jo + ']'
                             result_line.append(jo)

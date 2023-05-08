@@ -1,5 +1,5 @@
 function [sus,res] = tvdi(lfs, mask, vox, tv_reg, weights, z_prjs, Itnlim, pNorm)
-%TVDI Total variation dipole inversion.
+% TVDI Total variation dipole inversion.
 %
 % Method is similar to Appendix in the following paper
 % Lustig, M., Donoho, D. and Pauly, J. M. (2007), 
