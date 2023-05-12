@@ -3,7 +3,9 @@ import numpy as np
 from Libs.dipole_inversion.nlcg import nlcg
 from Libs.dipole_inversion.cls_tv import Cls_TV
 from Libs.dipole_inversion.cls_dipconv import Cls_Dipconv
-from Transfer_Tools.numpy_over_write import padarray, circshift, ma_range, nd_grid, nd_grid_original
+from Transfer_Tools.numpy_over_write import padarray, ma_range, nd_grid_original
+from tools.StructureCLass import Param
+from Libs.Misc.NIFTI_python.nifti_base import make_save_nii_engine
 
 
 def tvdi(lfs, mask, vox, tv_reg, weights, z_prjs=None, Itnlim=None, pNorm=None):
@@ -122,16 +124,8 @@ def tvdi(lfs, mask, vox, tv_reg, weights, z_prjs=None, Itnlim=None, pNorm=None):
     return sus, res
 
 
-class Param(object):
-    """
-    用于构建结构体的类
-    """
-    def __init__(self):
-        pass
-
-
 if __name__ == "__main__":
-    from scipy.io import loadmat, savemat
+    from scipy.io import loadmat
 
     data_source_file = "./Source_and_output/lfs.mat"
     lfs = np.array(loadmat(data_source_file)["lfs"])
@@ -141,7 +135,9 @@ if __name__ == "__main__":
     tv_reg = 5e-4
     weights = mask
     z_prjs = [0, 0, 1]
-    Itnlim = 2
+    Itnlim = 10
     pNorm = 1
     sus, res = tvdi(lfs, mask, vox, tv_reg, weights, z_prjs, Itnlim, pNorm)
+    make_save_nii_engine(sus, "sus", [1, 1, 1], "sus.nii")
+    make_save_nii_engine(res, "res", [1, 1, 1], "res.nii")
 

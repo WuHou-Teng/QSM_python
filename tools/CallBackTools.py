@@ -42,3 +42,12 @@ class CallBackTool(object):
     def print_predict_time(self, iters, total_iters):
         self.update_time(iter_num=iters)
         print(f"预计剩余时间:{self.average_time * (total_iters - iters)}秒")
+
+    def print_time_function_start(self, function_name):
+        self.update_time()
+        print(f"开始运行函数:{function_name}")
+
+    def print_time_function_end(self, function_name):
+        self.update_time()
+        print(f"结束运行函数:{function_name}")
+        print(f"函数耗时:{self.part_time}秒")

@@ -4,7 +4,7 @@ if ~ exist('poly_order','var') || isempty(poly_order)
     poly_order = 2;
 end
 
-[np nv nv2] = size(lfs);
+[np, nv, nv2] = size(lfs);
 
 % polyfit
 px = repmat((1:np)',[nv*nv2,1]);

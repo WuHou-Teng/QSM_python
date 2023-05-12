@@ -56,7 +56,7 @@ def nlcg(m0, params):
         [f0, RES0, TVterm0] = objFunc(m, dm, 0, params)
         [f1, RES, TVterm] = objFunc(m, dm, t, params)
         lsiter = 0
-
+        callback.print_time_line(59)
         #     while (f1 > f0 + alpha*t*(g0(:)'*dm(:))) && (lsiter<maxlsiter)
         #         t = t* beta;
         #         [f1, RES, TVterm] = objFunc(m,dm,t,params);
@@ -68,7 +68,8 @@ def nlcg(m0, params):
             t = t * beta
             [f1, RES, TVterm] = objFunc(m, dm, t, params)
             lsiter = lsiter + 1
-
+            callback.print_time_line(71)
+        callback.print_time_line(72)
         # control the number of line searches by adapting the initial step search
         if lsiter > 2:
             t0 = t0 * beta
@@ -89,7 +90,7 @@ def nlcg(m0, params):
         g0 = g1
         dm = -g1 + bk * dm
         k = k + 1
-
+        callback.print_time_line(93)
         # outputs for debugging purpose
         # fprintf('%d , relative residual: %f\n',...
         #         k, abs(RES-RES0)/RES);
@@ -104,7 +105,7 @@ def nlcg(m0, params):
               f"{np.linalg.norm(t * np.reshape(dm, (np.size(dm), 1))) / np.linalg.norm(np.reshape(m, (np.size(m), 1)))}")
         callback.print_time_iter(k)
         callback.print_predict_time(k, params.Itnlim)
-
+        callback.print_time_line(108)
         # if (norm(t * dm(:)) / norm(m(:)) <= gradToll):
         if np.linalg.norm(t * dm) / np.linalg.norm(m) <= gradToll:
             count = count + 1
@@ -116,11 +117,13 @@ def nlcg(m0, params):
 
         f = f1
         RES0 = RES
-
+    callback.print_time_line(120)
     return m, RES, TVterm
 
 
 def objFunc(m, dm, t, params):
+    callback = CallBackTool()
+    callback.print_time_function_start("objFunc")
     p = params.pNorm
     w1 = m + t * dm
 
@@ -138,10 +141,13 @@ def objFunc(m, dm, t, params):
     )
 
     obj = RES + TVterm
+    callback.print_time_function_end("objFunc")
     return obj, RES, TVterm
 
 
 def wGradient(m, params):
+    callback = CallBackTool()
+    callback.print_time_function_start("wGradient")
     p = params.pNorm
     # params.TV 是cls_tv类，在matlab中，代码对mtimes进行了重载，而mtimes在matlab中是代表乘法的内置函数。
     # 因此，这里需要调用mtimes函数，而非直接打乘号
@@ -159,4 +165,5 @@ def wGradient(m, params):
     )
 
     grad = 2 * gradRES + gradTV * params.TVWeight
+    callback.print_time_function_end("wGradient")
     return grad
