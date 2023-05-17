@@ -208,10 +208,10 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
     for i in range(EchoTrainLength):
         try:
             dicom_info = pydicom.dcmread(
-                os.path.join(path_mag, mag_list[np.ceil(1 + i * len(mag_list) / EchoTrainLength)]))
+                os.path.join(path_mag, mag_list[int(np.ceil(1 + i * len(mag_list) / EchoTrainLength))]))
         except IndexError:
             dicom_info = pydicom.dcmread(
-                os.path.join(path_mag, mag_list[np.floor(1 + i * len(mag_list) / EchoTrainLength)]))
+                os.path.join(path_mag, mag_list[int(np.floor(1 + i * len(mag_list) / EchoTrainLength))]))
         # 这里涉及到matlab中数组长度的动态更新，python数组需要预定义，具体长度未知。所以采用手动动态更新。
         try:
             TE[dicom_info.EchoNumbers] = dicom_info.EchoTime * 1e-3
@@ -241,7 +241,7 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
     #     mag(:,:,NS,NE) = permute(single(dicomread([path_mag,filesep,mag_list(i).name])),[2,1]);
     # end
     # mag的维度为[Columns, Rows, NS, NE]，其中Columns和Rows和matlab是反过来的。此外，NS为slice方向，NE为echo方向。
-    mag = np.zeros([dicom_info.Columns, dicom_info.Rows, len(mag_list) / EchoTrainLength, EchoTrainLength])
+    mag = np.zeros([dicom_info.Columns, dicom_info.Rows, int(len(mag_list) / EchoTrainLength), EchoTrainLength])
     for i in range(len(mag_list)):
         # matlab 的ind2sub 和 numpy的unravel_index的效果有所区别
         # matlab:
@@ -253,7 +253,7 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
         #   >> row, col = np.unravel_index(array, [3, 3])
         #   << row = [0, 1, 1, 1], col = [2， 0， 1， 2] ## 注意，numpy 反馈的 col 和 row 和 matlab 是反过来的。
         # 获取索引i对应的，在[len(mag_list) / EchoTrainLength, EchoTrainLength]中的位置坐标。
-        NE, NS = np.unravel_index(i, [len(mag_list) / EchoTrainLength, EchoTrainLength])  # 将NS和NE对调。
+        NS, NE = np.unravel_index(i, [int(len(mag_list) / EchoTrainLength), EchoTrainLength])  # 将NS和NE对调。
         # 在NumPy中，.pixel_array是DICOM（数字图像通信）图像对象的属性之一。
         # DICOM是医学图像和相关信息的国际标准，.pixel_array用于存储DICOM图像的像素数据。
         mag[:, :, NS, NE] = np.transpose(np.single(pydicom.dcmread(os.path.join(path_mag, mag_list[i])).pixel_array))
@@ -274,9 +274,9 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
     #     ph(:,:,NS,NE) = permute(single(dicomread([path_ph,filesep,ph_list(i).name])),[2,1]);% covert to [-pi pi] range
     #     ph(:,:,NS,NE) = ph(:,:,NS,NE)/4095*2*pi - pi;
     # end
-    ph = np.zeros([dicom_info.Columns, dicom_info.Rows, len(ph_list) / EchoTrainLength, EchoTrainLength])
+    ph = np.zeros([dicom_info.Columns, dicom_info.Rows, int(len(ph_list) / EchoTrainLength), EchoTrainLength])
     for i in range(len(ph_list)):
-        NE, NS = np.unravel_index(i, [len(ph_list) / EchoTrainLength, EchoTrainLength])
+        NS, NE = np.unravel_index(i, [int(len(ph_list) / EchoTrainLength), EchoTrainLength])
         ph[:, :, NS, NE] = np.transpose(np.single(pydicom.dcmread(os.path.join(path_ph, ph_list[i])).pixel_array))
         ph[:, :, NS, NE] = ph[:, :, NS, NE] / 4095 * 2 * np.pi - np.pi
 
