@@ -3,6 +3,7 @@ import os
 import matlab.engine
 from scipy.io import loadmat, savemat
 import numpy as np
+import nibabel as nib
 
 
 def make_save_nii_shell(data, data_name, vox, filename):
@@ -91,5 +92,6 @@ def make_save_nii_engine2(data, vox, filename):
 if __name__ == "__main__":
     lfs = loadmat("./lfs.mat")  # scipy.io.loadmat
     # make_save_nii_engine(lfs["lfs"], "lfs", [1, 1, 1], "lfs.nii")
-    make_save_nii_engine(lfs["lfs"], "lfs", [1, 1, 1], "lfs.nii")
-
+    # make_save_nii_engine(lfs["lfs"], "lfs", [1, 1, 1], "lfs.nii")
+    nii = nib.Nifti1Image(lfs["lfs"], np.eye(4))
+    nib.save(nii, "lfs.nii")

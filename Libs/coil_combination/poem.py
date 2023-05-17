@@ -1,5 +1,7 @@
 import os
 import struct
+import subprocess
+
 import numpy as np
 from scipy import ndimage
 from Libs.Misc.NIFTI_python.nifti_base import make_save_nii_engine
@@ -230,16 +232,11 @@ def poem(mag, pha, vox, te, mask=None, smooth_method=None, parpool_flag=None):
     # 		fid = fopen(['wrapped_offsets_chan' num2str(chan) '.dat'],'w')
     # 		fwrite(fid,angle(offsets(:,:,:,chan)),'float')
     # 		fclose(fid)
-
     # 		setenv('chan',num2str(chan))
 
-    # 		if isdeployed
-    # 			bash_script = ['~/bin/3DSRNCP wrapped_offsets_chan${chan}.dat mask_unwrp.dat
-    # 			unwrapped_offsets_chan${chan}.dat $nv $np $ns reliability_diff.dat'];
-    # 		else
-    # 			bash_script = ['${pathstr}/3DSRNCP wrapped_offsets_chan${chan}.dat mask_unwrp.dat ' ...
-    #             'unwrapped_offsets_chan${chan}.dat $nv $np $ns reliability_diff.dat'];
-    # 		end
+    # 		bash_script = ['${pathstr}/3DSRNCP wrapped_offsets_chan${chan}.dat mask_unwrp.dat ' ...
+    #         'unwrapped_offsets_chan${chan}.dat $nv $np $ns reliability_diff.dat'];
+
     # 		unix(bash_script)
     # 		fid = fopen(['unwrapped_offsets_chan' num2str(chan) '.dat'],'r')
     # 		tmp = fread(fid,'float')
@@ -260,14 +257,13 @@ def poem(mag, pha, vox, te, mask=None, smooth_method=None, parpool_flag=None):
             bash_script = (path_3dSRNCP + f'/3DSRNCP wrapped_offsets_chan{str(chan)}.dat mask_unwrp.dat '
                                           f'unwrapped_offsets_chan{str(chan)}.dat $nv $np $ns reliability_diff.dat')
             # unix(bash_script)
-            os.system(bash_script)
+            subprocess.run(bash_script, shell=True)
 
             # TODO 读取unwrapped_offsets_chan${chan}.dat
             with open(f'unwrapped_offsets_chan{str(chan)}.dat', 'rb') as fid:
                 tmp = np.fromfile(fid, dtype='float32')
             tmp = np.reshape(tmp - np.round(np.mean(tmp[mask == 1]) / (2 * np.pi)) * 2 * np.pi, imsize[0:3])
             unph_offsets[..., chan] = tmp * mask
-            # TODO 改写 poly3d 为python。
             offsets[..., chan] = poly3d(unph_offsets[..., chan], mask, 3)
 
         # offsets = exp(1j*offsets)
@@ -279,7 +275,6 @@ def poem(mag, pha, vox, te, mask=None, smooth_method=None, parpool_flag=None):
     # 	end
     elif smooth_method.lower() == 'poly3_nlcg':
         for chan in range(nrcvrs):
-            # TODO poly3d_nonlinear 改写
             offsets[..., chan] = poly3d_nonlinear(offsets[..., chan], mask, 3)
     # else
     # 	error('what method to use for smoothing? smooth3 or poly3 or poly3_nlcg')
@@ -289,7 +284,7 @@ def poem(mag, pha, vox, te, mask=None, smooth_method=None, parpool_flag=None):
 
     # nii = make_nii(angle(offsets),vox)
     # save_nii(nii,'offsets_smooth.nii')
-    make_save_nii_engine(np.angle(offsets), "offsets",vox, 'offsets_smooth.nii')
+    make_save_nii_engine(np.angle(offsets), "offsets", vox, 'offsets_smooth.nii')
 
     # # combine phase according to complex summation
     # img_cmb = mean(mag.*exp(1j*pha)./offsets,5)

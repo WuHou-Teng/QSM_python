@@ -15,39 +15,39 @@ function[ ROIout ] = shaver( ROIin, R )
 %   [Rx Ry Rz], each dimension is then eroded by its corresponding R value.
 %
 
-if any( R == 0 )
-	ROIout = ROIin ;
-	disp('Radius cannot be zero. Returning input array') 
-else
-	inputIsFloat = true;
-    tmp = whos('ROIin');
-	switch tmp.class
-	    case {'single','double'}
-	        inputIsFloat   = true ;
-	        ROIin          = logical( ROIin ) ;
-	    case {'logical'}
-	        inputIsFloat = false ;
-	end
+    if any( R == 0 )
+        ROIout = ROIin ;
+        disp('Radius cannot be zero. Returning input array')
+    else
+        inputIsFloat = true;
+        tmp = whos('ROIin');
+        switch tmp.class
+            case {'single','double'}
+                inputIsFloat   = true ;
+                ROIin          = logical( ROIin ) ;
+            case {'logical'}
+                inputIsFloat = false ;
+        end
 
-	if any( mod( size( ROIin ), 2 ) == 0 )
-	    isCroppingToOddDimensions = true ;
-	    ROIin                     = makeodd( ROIin ) ;
-	    gridDimensionVector       = size( ROIin ) ;
-	else
-	    isCroppingToOddDimensions = false ;
-	    gridDimensionVector = size( ROIin ) ;
-	end
+        if any( mod( size( ROIin ), 2 ) == 0 )
+            isCroppingToOddDimensions = true ;
+            ROIin                     = makeodd( ROIin ) ;
+            gridDimensionVector       = size( ROIin ) ;
+        else
+            isCroppingToOddDimensions = false ;
+            gridDimensionVector = size( ROIin ) ;
+        end
 
-	sphere              = createellipsoid( gridDimensionVector, R) ;
-	ROIout              = ifftc( fftc(ROIin) .* fftc( sphere/sum( sphere(:)) ) ) ;
-	ROIout              = abs(ROIout) >= 1 - 0.99/sum(sphere(:)) ;
+        sphere              = createellipsoid( gridDimensionVector, R) ;
+        ROIout              = ifftc( fftc(ROIin) .* fftc( sphere/sum( sphere(:)) ) ) ;
+        ROIout              = abs(ROIout) >= 1 - 0.99/sum(sphere(:)) ;
 
-	if inputIsFloat
-	    ROIout = double( ROIout ) ;
-	end
+        if inputIsFloat
+            ROIout = double( ROIout ) ;
+        end
 
-	if isCroppingToOddDimensions
-	    ROIout = makeodd( ROIout, 'isUndoing' ) ;
-	end
+        if isCroppingToOddDimensions
+            ROIout = makeodd( ROIout, 'isUndoing' ) ;
+        end
 
 end

@@ -104,8 +104,6 @@ def tvdi(lfs, mask, vox, tv_reg, weights, z_prjs=None, Itnlim=None, pNorm=None):
 
     param.wt = W  # weighting matrix
 
-
-
     # non-linear conjugate gradient method
     sus, RES_nlcg, TVterm_nlcg = nlcg(np.zeros((Nx, Ny, Nz)), param)
 
@@ -116,7 +114,6 @@ def tvdi(lfs, mask, vox, tv_reg, weights, z_prjs=None, Itnlim=None, pNorm=None):
 
     # residual difference between fowardly calculated field and lfs
     res = lfs - np.real(np.fft.ifftn(D * np.fft.fftn(sus)))
-
 
     # remove the extra padding slices
     sus = sus[:, :, 20:-1-20]
@@ -135,7 +132,7 @@ if __name__ == "__main__":
     tv_reg = 5e-4
     weights = mask
     z_prjs = [0, 0, 1]
-    Itnlim = 10
+    Itnlim = 500
     pNorm = 1
     sus, res = tvdi(lfs, mask, vox, tv_reg, weights, z_prjs, Itnlim, pNorm)
     make_save_nii_engine(sus, "sus", [1, 1, 1], "sus.nii")

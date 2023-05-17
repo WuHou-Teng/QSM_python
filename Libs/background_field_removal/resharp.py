@@ -130,6 +130,16 @@ def resharp(tfs, mask, vox=None, ker_rad=3, tik_reg=1e-4, iter_num=200):
     # 整个展平一个ndarray，在matlab中，b(:)是展为(n,1)，而在python中用b.flatten() 获得的是(n,) 。所以需要用reshape
     b = b.reshape(b.size, 1)
 
+    # % nested function
+    # function y = Afun(x)
+    #     % y = H'*(H*x) + tik_reg*x;
+    #     x = reshape(x,imsize);
+    #     y = ifftn(conj(DKER).*fftn(circshift(mask_ero.*circshift(ifftn(DKER.*fftn(x)),-csh),csh))) + tik_reg*x;
+    #
+    #     y = y(:);
+    # end
+    # m = cgs(@Afun, b, 1e-6, iter_num);
+
     # nested function
     def Afun(x):
         # y = H'*(H*x) + tik_reg*x;
@@ -142,9 +152,9 @@ def resharp(tfs, mask, vox=None, ker_rad=3, tik_reg=1e-4, iter_num=200):
     # TODO csg 迭代。
     A = LinearOperator((b.size, b.size), Afun)
     tol = 1e-6
-    callback.print_time_line(141)
+
     m, info = cgs(A, b, tol=tol, maxiter=iter_num, callback=callback.csg_callback_func)
-    callback.print_time_line(143)
+
     if info > 1e-6:
         print(f"cgs 在迭代 {iter_num} 停止，而没有收敛到所需容差 {tol}，"
               f"这是因为已达到最大迭代数。迭代返回的 (数目 {iter_num}) 的相对残差为 {info}。")
