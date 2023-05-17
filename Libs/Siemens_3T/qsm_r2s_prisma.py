@@ -139,7 +139,7 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
     #     % options.bkg_rm = {'pdf','sharp','resharp','esharp','lbv'};
     # end
     if not options.is_field('bkg_rm'):
-        options.bkg_rm = 'resharp'
+        options.bkg_rm = ['resharp']
         # options.bkg_rm = {'pdf','sharp','resharp','esharp','lbv'};
 
     if not options.is_field('t_svd'):
@@ -164,7 +164,7 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
         options.tv_reg = 5e-4
 
     if not options.is_field('inv_num'):
-        options.inv_num = 500
+        options.inv_num = 20
 
     if not options.is_field('interp'):
         options.interp = 0
@@ -189,9 +189,11 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
     # % read in DICOMs of both magnitude and raw unfiltered phase images
     # % read in magnitude DICOMs
     # path_mag = cd(cd(path_mag)); TODO 这里直接跳到对应的文件夹，避免了后面的路径拼接
+    path_mag = os.path.abspath(path_mag)
     os.chdir(path_mag)
     # mag_list = dir(path_mag);
     mag_list = os.listdir(path_mag)  # 获取目录下所有文件的名称列表。
+    mag_list = sorted(mag_list)
     # mag_list = mag_list(~strncmpi('.', {mag_list.name}, 1));
     mag_list = [filename for filename in mag_list if not filename.startswith('.')]  # 去除隐藏文件
 
@@ -214,7 +216,7 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
                 os.path.join(path_mag, mag_list[int(np.floor(1 + i * len(mag_list) / EchoTrainLength))]))
         # 这里涉及到matlab中数组长度的动态更新，python数组需要预定义，具体长度未知。所以采用手动动态更新。
         try:
-            TE[dicom_info.EchoNumbers] = dicom_info.EchoTime * 1e-3
+            TE[dicom_info.EchoNumbers-1] = dicom_info.EchoTime * 1e-3
         except IndexError:
             for j in range(dicom_info.EchoNumbers - len(TE) + 1):
                 TE.append(0)
@@ -222,7 +224,7 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
     TE = np.array(TE)
     # vox = [dicom_info.PixelSpacing(1), dicom_info.PixelSpacing(2), dicom_info.SliceThickness];
     vox = [dicom_info.PixelSpacing[0], dicom_info.PixelSpacing[1], dicom_info.SliceThickness]
-
+    vox = [int(ele) for ele in vox]
     # % angles!!! (z projections)
     # Xz = dicom_info.ImageOrientationPatient(3);
     Xz = dicom_info.ImageOrientationPatient[2]
@@ -254,6 +256,7 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
         #   << row = [0, 1, 1, 1], col = [2， 0， 1， 2] ## 注意，numpy 反馈的 col 和 row 和 matlab 是反过来的。
         # 获取索引i对应的，在[len(mag_list) / EchoTrainLength, EchoTrainLength]中的位置坐标。
         NS, NE = np.unravel_index(i, [int(len(mag_list) / EchoTrainLength), EchoTrainLength])  # 将NS和NE对调。
+        # print(f'i:{i}, NS:{NS}, NE:{NE}')
         # 在NumPy中，.pixel_array是DICOM（数字图像通信）图像对象的属性之一。
         # DICOM是医学图像和相关信息的国际标准，.pixel_array用于存储DICOM图像的像素数据。
         mag[:, :, NS, NE] = np.transpose(np.single(pydicom.dcmread(os.path.join(path_mag, mag_list[i])).pixel_array))
@@ -263,9 +266,11 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
 
     # % read in phase DICOMs
     # path_ph = cd(cd(path_ph));
+    path_ph = os.path.abspath(path_ph)
     os.chdir(path_ph)  # 还是采用cd，不然调用的函数不知道自己的工作文件夹
     # ph_list = dir(path_ph);
     ph_list = os.listdir(path_ph)
+    ph_list = sorted(ph_list)
     # ph_list = ph_list(~strncmpi('.', {ph_list.name}, 1));
     ph_list = [i for i in ph_list if not i.startswith('.')]  # 去除隐藏文件
     #
@@ -315,7 +320,7 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
     # path_qsm = [path_out '/QSM_R2S_PRISMA'];
     path_qsm = os.path.join(path_out, 'QSM_R2S_PRISMA')
     # mkdir(path_qsm);
-    os.mkdir(path_qsm)
+    os.mkdir(path_qsm) if not os.path.exists(path_qsm) else None
     # init_dir = pwd;
     init_dir = os.getcwd()
     # cd(path_qsm);  # 还是用cd，但是之前写的os.path.join就不需要动了，因为本就是绝对路径
@@ -323,7 +328,7 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
 
     # % save magnitude and raw phase niftis for each echo
     # mkdir('src')
-    os.mkdir(os.path.join(path_qsm, 'src'))
+    os.mkdir(os.path.join(path_qsm, 'src')) if not os.path.exists(os.path.join(path_qsm, 'src')) else None
     # for echo = 1:imsize(4)
     #     nii = make_nii(mag(:,:,:,echo),vox);
     #     save_nii(nii,['src/mag' num2str(echo) '.nii']);
@@ -351,7 +356,7 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
     # [~,~] = unix('rm BET*');
     subprocess.run('rm BET*', shell=True)
     # unix('bet2 src/mag1.nii BET -f ${bet_thr} -m -w ${bet_smooth}');
-    subprocess.run(f'bet2 {os.path.join(path_qsm, "src/mag1.nii")} BET -f ${bet_thr} -m -w ${bet_smooth}', shell=True)
+    subprocess.run(f'bet2 {os.path.join(path_qsm, "src/mag1.nii")} BET -f {bet_thr} -m -w {bet_smooth}', shell=True)
     # unix('gunzip -f BET.nii.gz');
     subprocess.run('gunzip -f BET.nii.gz', shell=True)
     # unix('gunzip -f BET_mask.nii.gz');
@@ -359,14 +364,14 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
     # nii = load_nii('BET_mask.nii'); TODO 直接采用nib加载了nii文件，但不确定加载的数据格式是否要调整。
     nii = nib.load(os.path.join(path_qsm, 'BET_mask.nii'))
     # mask = double(nii.img);
-    mask = np.double(nii.img)
+    mask = np.double(nii.get_fdata())
 
     # % phase offset correction
     # % if unipolar
     # if strcmpi('unipolar',readout)
     #     ph_corr = geme_cmb(mag.*exp(1j*ph),vox,TE,mask);
     if readout.lower() == 'unipolar':
-        ph_corr = geme_cmb(mag * np.exp(1j * ph), vox, TE, mask)
+        ph_corr = geme_cmb(mag * np.exp(1j * ph), vox, TE, mask)[0]
     # % if bipolar
     # elseif strcmpi('bipolar',readout)
     elif readout.lower() == 'bipolar':
@@ -400,6 +405,7 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
         print('--> unwrap aliasing phase for all TEs using prelude...')
         # setenv('echo_num',num2str(imsize(4)));
         os.environ['echo_num'] = str(imsize[3])
+        echo_num = str(imsize[3])
         # bash_command = sprintf(['for ph in src/ph_corr[1-$echo_num].nii\n' ...
         # 'do\n' ...
         # 'base=`basename $ph`;\n' ...
@@ -412,29 +418,19 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
         # 'gunzip -f unph*.gz\n']);
         # 在 MATLAB 中，上述代码的作用是通过使用 prelude 程序对一组 NIfTI 格式的磁共振相位图像进行处理。
         # 具体来说，它通过循环处理 src/ph_corr[1-$echo_num].nii 这些文件，并执行以下操作：
-        #
         # 从路径中获取文件名和目录名。
         # 构建相应的磁共振幅值图像 mag 和未包裹相位图像 unph 的文件名。
         # 使用 prelude 程序处理 mag 和 ph，并生成 unph 文件。
         # 在后台运行 prelude 命令，以便能够继续执行其他命令。
         # 等待所有后台任务完成。
         # 解压缩所有生成的 unph 文件。
-
-        bash_command = '''
-        for ph in src/ph_corr[1-$echo_num].nii
-        do
-            base=$(basename $ph);
-            dir=$(dirname $ph);
-            mag=$dir/"mag"${base:7};
-            unph="unph"${base:7};
-            prelude -a $mag -p $ph -u $unph -m BET_mask.nii -n 12&
-        done
-        wait
-        gunzip -f unph*.gz
-        '''
-
+        bash_command = (f'for ph in src/ph_corr[1-{echo_num}].nii; '
+                        f'do base=$(basename $ph); dir=$(dirname $ph); '
+                        f'mag=$dir/"mag"${{base:7}}; unph="unph"${{base:7}}; '
+                        f'prelude -a $mag -p $ph -u $unph -m BET_mask.nii -n 12& '
+                        f'done; '
+                        f'wait; gunzip -f unph*.gz')
         subprocess.run(bash_command, shell=True)
-
         # unph = zeros(imsize);
         unph = np.zeros(imsize)
         # for echo = 1:imsize(4)
@@ -453,15 +449,17 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
         print('--> unwrap aliasing phase using bestpath...')
         # mask_unwrp = uint8(abs(mask)*255);
         mask_unwrp = np.uint8(np.abs(mask) * 255)
+        mask_unwrp = np.ascontiguousarray(mask_unwrp)  # 转换为 C 连续的内存布局
         # fid = fopen('mask_unwrp.dat','w');
         # fwrite(fid,mask_unwrp,'uchar');
         # fclose(fid);
-        with open(os.path.join(path_mag, 'mask_unwrp.dat'), 'wb') as fid:
-            fid.write(mask_unwrp)
+        with open(os.path.join(path_qsm, 'mask_unwrp.dat'), 'wb') as fid:
+            fid.write(mask_unwrp.tobytes())
 
         # [pathstr, ~, ~] = fileparts(which('3DSRNCP.m')); determine the path of 3DSRNCP.m
         abs_path = os.path.dirname(os.path.abspath(__file__)).split("Libs")[0]
-        pathstr = abs_path + "Libs\\phase_unwrap\\"
+        pathstr = abs_path + "Libs/phase_unwrapping/"
+
         # setenv('pathstr',pathstr);
         # setenv('nv',num2str(imsize(1)));
         # setenv('np',num2str(imsize(2)));
@@ -481,44 +479,51 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
             # fwrite(fid,ph_corr(:,:,:,echo_num),'float');
             # fclose(fid);
             # 因为是dat文件，所以还是用write的形式写入。
-            with open(os.path.join(path_mag, f'wrapped_phase{echo_num}.dat'), 'wb') as fid:
+            with open(os.path.join(path_qsm, f'wrapped_phase{echo_num}.dat'), 'wb') as fid:
                 # 用numpy的tofile方法写入
-                ph_corr[:, :, :, echo_num].tofile(fid)
+                # ph_corr[:, :, :, echo_num].tofile(fid)
+                fid.write(ph_corr[:, :, :, echo_num].astype('float32').tobytes())
                 # fid.write(ph_corr[:, :, :, echo_num])
 
+            # 运行 3DSRNCP
             # bash_script = ['${pathstr}/3DSRNCP wrapped_phase${echo_num}.dat mask_unwrp.dat
             #                   unwrapped_phase${echo_num}.dat $nv $np $ns reliability${echo_num}.dat'];
-            bash_script = (f'{pathstr}3DSRNCP wrapped_phase{echo_num}.mat mask_unwrp.mat '
-                           f'unwrapped_phase{echo_num}.mat $nv $np $ns reliability{echo_num}.mat')
+            bash_script = (pathstr + f'3DSRNCP wrapped_phase{echo_num}.dat mask_unwrp.dat '
+                                     f'unwrapped_phase{echo_num}.dat $nv $np $ns reliability{echo_num}.dat')
+
             # unix(bash_script) ;
+            # TODO Segmentation fault (core dumped)
             subprocess.run(bash_script, shell=True)
             # fid = fopen(['unwrapped_phase' num2str(echo_num) '.dat'],'r');
             # tmp = fread(fid,'float');
-            tmp = np.fromfile(os.path.join(path_mag, f'unwrapped_phase{echo_num}.mat'), dtype=np.float32)
+            tmp = np.reshape(
+                np.fromfile(os.path.join(path_qsm, f'unwrapped_phase{echo_num}.dat'), dtype=np.float32), imsize[0:3])
             # % tmp = tmp - tmp(1);
             # unph(:,:,:,echo_num) = reshape(tmp - round(mean(tmp(mask==1))/(2*pi))*2*pi ,imsize(1:3)).*mask;
             unph[:, :, :, echo_num] = np.reshape(
-                tmp - np.round(np.mean(tmp[mask == 1])) / ((2 * np.pi) * 2 * np.pi, imsize[0:3])
+                tmp - np.round(np.mean(tmp[mask == 1])) / ((2 * np.pi) * 2 * np.pi), imsize[0:3]
             ) * mask
 
             # fid = fopen(['reliability' num2str(echo_num) '.dat'],'r');
             # reliability_raw = fread(fid,'float');
             # reliability_raw = reshape(reliability_raw,imsize(1:3));
             # fclose(fid);
-            reliability_raw = np.fromfile(os.path.join(path_mag, f'reliability{echo_num}.mat'), dtype=np.float32)
+            reliability_raw = np.fromfile(os.path.join(path_qsm, f'reliability{echo_num}.dat'), dtype=np.float32)
             reliability_raw = np.reshape(reliability_raw, imsize[0:3])
 
             # nii = make_nii(reliability_raw.*mask,vox);
             # save_nii(nii,['reliability_raw' num2str(echo_num) '.nii']);
             # make_save_nii_engine(reliability_raw * mask, f"reliability_raw{echo_num}", vox,
-            #                      os.path.join(path_mag, f'reliability_raw{echo_num}.nii'))
+            #                      os.path.join(path_qsm, f'reliability_raw{echo_num}.nii'))
             nii = nib.Nifti1Image(reliability_raw * mask, np.eye(4))
-            nib.save(nii, os.path.join(path_mag, f'reliability_raw{echo_num}.nii'))
+            nib.save(nii, os.path.join(path_qsm, f'reliability_raw{echo_num}.nii'))
         # end
         #
         # nii = make_nii(unph,vox);
         # save_nii(nii,'unph_bestpath.nii');
-        make_save_nii_engine(unph, 'unph_bestpath', vox, os.path.join(path_mag, 'unph_bestpath.nii'))
+        # make_save_nii_engine(unph, 'unph_bestpath', vox, os.path.join(path_qsm, 'unph_bestpath.nii'))
+        nii = nib.Nifti1Image(unph, np.eye(4))
+        nib.save(nii, 'unph_bestpath.nii')
     #
     # else
     else:
@@ -532,7 +537,7 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
 
     # nii = load_nii('unph_diff.nii');
     # unph_diff = double(nii.img);
-    unph_diff = nib.load(os.path.join(path_mag, 'unph_diff.nii')).get_fdata().astype(np.float64)
+    unph_diff = nib.load(os.path.join(path_qsm, 'unph_diff.nii')).get_fdata().astype(np.float64)
 
     # for echo = 2:imsize(4)
     # meandiff = unph(:,:,:,echo)-unph(:,:,:,1)-double(echo-1)*unph_diff;
@@ -556,8 +561,7 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
     # disp('--> magnitude weighted LS fit of phase to TE ...');
     # [tfs, fit_residual] = echofit(unph,mag,TE,0);
     print('--> magnitude weighted LS fit of phase to TE ...')
-    # TODO echofit需要翻译
-    tfs, fit_residual = echofit(unph, mag, TE, 0)
+    tfs, fit_residual, _ = echofit(unph, mag, TE, 0)
 
     # % extra filtering according to fitting residuals
     # if r_mask
@@ -568,7 +572,7 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
     #     R = ones(size(fit_residual_blur));
     #     R(fit_residual_blur >= fit_thr) = 0;
     if r_mask:
-        fit_residual_blur = ndimage.uniform_filter(fit_residual, size=np.round(1. / vox) * 2 + 1)
+        fit_residual_blur = ndimage.uniform_filter(fit_residual, size=np.round(np.ones(np.shape(vox)) / vox) * 2 + 1)
         nii = nib.Nifti1Image(fit_residual_blur, np.eye(4))
         nib.save(nii, os.path.join(path_qsm, 'fit_residual_blur.nii'))
         R = np.ones(fit_residual_blur.shape)
@@ -594,7 +598,7 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
     # if sum(strcmpi('lnqsm',bkg_rm))
     if 'lnqsm' in bkg_rm:
         # mkdir LN-QSM
-        os.mkdir("LN-QSM")
+        os.mkdir("LN-QSM") if not os.path.exists("./LN_QSM") else None
 
         # maskR = mask.*R;
         # iMag = sqrt(sum(mag.^2,4));
@@ -665,7 +669,7 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
         P = maskR + 30 * (1 - maskR)
         chi_ero0_500 = tikhonov_qsm(tfs, Res_wt * maskR, 1, maskR, maskR, 0, 1e-4, 0.001, 0, vox, P, z_prjs, 500)
         nii = nib.Nifti1Image(chi_ero0_500 * maskR, np.eye(4))
-        nib.save(nii, '\\LN-QSM\\chi_ero0_tik_1e-3_tv_1e-4_500.nii.gz')
+        nib.save(nii, './LN-QSM/chi_ero0_tik_1e-3_tv_1e-4_500.nii.gz')
 
         # % (2) erode 1 voxel from brain edge
         # P = mask_ero1 + 30*(1 - mask_ero1);
@@ -677,7 +681,7 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
         chi_ero1_500 = tikhonov_qsm(tfs, Res_wt * mask_ero1, 1, mask_ero1, mask_ero1, 0, 1e-4, 0.001, 0, vox, P, z_prjs,
                                     500)
         nii = nib.Nifti1Image(chi_ero1_500 * mask_ero1, np.eye(4))
-        nib.save(nii, '\\LN-QSM\\chi_ero1_tik_1e-3_tv_1e-4_500.nii.gz')
+        nib.save(nii, './LN-QSM/chi_ero1_tik_1e-3_tv_1e-4_500.nii.gz')
 
         # % (3) erode 2 voxel from brain edge
         # P = mask_ero2 + 30*(1 - mask_ero2);
@@ -689,7 +693,7 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
         chi_ero2_500 = tikhonov_qsm(tfs, Res_wt * mask_ero2, 1, mask_ero2, mask_ero2, 0, 1e-4, 0.001, 0, vox, P, z_prjs,
                                     500)
         nii = nib.Nifti1Image(chi_ero2_500 * mask_ero2, np.eye(4))
-        nib.save(nii, '\\LN-QSM\\chi_ero2_tik_1e-3_tv_1e-4_500.nii.gz')
+        nib.save(nii, './LN-QSM/chi_ero2_tik_1e-3_tv_1e-4_500.nii.gz')
 
         # % (4) erode 3 voxel from brain edge
         # P = mask_ero3 + 30*(1 - mask_ero3);
@@ -717,11 +721,11 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
 
         # % save nifti
         # mkdir('PDF');
-        os.mkdir('PDF')
+        os.mkdir('PDF') if not os.path.exists("./PDF") else None
         # nii = make_nii(lfs_pdf,vox);
         # save_nii(nii,'PDF/lfs_pdf.nii');
         nii = nib.Nifti1Image(lfs_pdf, np.eye(4))
-        nib.save(nii, '\\PDF\\lfs_pdf.nii.gz')
+        nib.save(nii, './PDF/lfs_pdf.nii.gz')
 
         # % inversion of susceptibility
         # disp('--> TV susceptibility inversion on PDF...');
@@ -733,7 +737,7 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
         # nii = make_nii(sus_pdf.*mask_pdf,vox);
         # save_nii(nii,'PDF/sus_pdf.nii');
         nii = nib.Nifti1Image(sus_pdf * mask_pdf, np.eye(4))
-        nib.save(nii, '\\PDF\\sus_pdf.nii.gz')
+        nib.save(nii, './PDF/sus_pdf.nii.gz')
 
     # % SHARP (t_svd: truncation threthold for t_svd)
     # if sum(strcmpi('sharp',bkg_rm))
@@ -749,9 +753,9 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
         # mkdir('SHARP');
         # nii = make_nii(lfs_sharp,vox);
         # save_nii(nii,'SHARP/lfs_sharp.nii');
-        os.mkdir('SHARP')
+        os.mkdir('SHARP') if not os.path.exists("./SHARP") else None
         nii = nib.Nifti1Image(lfs_sharp, np.eye(4))
-        nib.save(nii, '\\SHARP\\lfs_sharp.nii.gz')
+        nib.save(nii, './SHARP/lfs_sharp.nii.gz')
 
         # % inversion of susceptibility
         # disp('--> TV susceptibility inversion on SHARP...');
@@ -762,8 +766,9 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
         # % save nifti
         # nii = make_nii(sus_sharp.*mask_sharp,vox);
         # save_nii(nii,'SHARP/sus_sharp.nii');
+        # TODO 这里 sus 和 res 形状不同导致报错，但目前不是重点。
         nii = nib.Nifti1Image(sus_sharp * mask_sharp, np.eye(4))
-        nib.save(nii, '\\SHARP\\sus_sharp.nii.gz')
+        nib.save(nii, './SHARP/sus_sharp.nii.gz')
 
     # % RE-SHARP (tik_reg: Tikhonov regularization parameter)
     # if sum(strcmpi('resharp',bkg_rm))
@@ -779,9 +784,9 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
         # mkdir('RESHARP');
         # nii = make_nii(lfs_resharp,vox);
         # save_nii(nii,'RESHARP/lfs_resharp.nii');
-        os.mkdir('RESHARP')
+        os.mkdir('RESHARP') if not os.path.exists("./RESHARP") else None
         nii = nib.Nifti1Image(lfs_resharp, np.eye(4))
-        nib.save(nii, '\\RESHARP\\lfs_resharp.nii.gz')
+        nib.save(nii, './RESHARP/lfs_resharp.nii.gz')
 
         # % inversion of susceptibility
         # disp('--> TV susceptibility inversion on RESHARP...');
@@ -793,7 +798,7 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
         # TODO 找不到QSM_iLSQR函数
         chi_iLSQR = QSM_iLSQR(lfs_resharp * (2.675e8 * dicom_info.MagneticFieldStrength) / 1e6, mask_resharp, 'H', z_prjs, 'voxelsize', vox, 'niter', 50, 'TE', 1000, 'B0', dicom_info.MagneticFieldStrength)
         nii = nib.Nifti1Image(chi_iLSQR, np.eye(4))
-        nib.save(nii, '\\RESHARP\\chi_iLSQR_smvrad' + str(smv_rad) + '.nii')
+        nib.save(nii, './RESHARP/chi_iLSQR_smvrad' + str(smv_rad) + '.nii')
 
         # % % MEDI 该部分被大量的注释掉了，遂不保留
         # % %%%%% normalize signal intensity by noise to get SNR %%%
@@ -805,7 +810,7 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
         # save_nii(nii,'RESHARP/sus_resharp.nii');
         sus_resharp = tvdi(lfs_resharp, mask_resharp, vox, tv_reg, mag[..., -1], z_prjs, inv_num)
         nii = nib.Nifti1Image(sus_resharp * mask_resharp, np.eye(4))
-        nib.save(nii, '\\RESHARP\\sus_resharp.nii')
+        nib.save(nii, './RESHARP/sus_resharp.nii')
 
     # % V-SHARP
     # if sum(strcmpi('vsharp',bkg_rm))
@@ -822,9 +827,9 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
         # mkdir('VSHARP');
         # nii = make_nii(lfs_vsharp,vox);
         # save_nii(nii,'VSHARP/lfs_vsharp.nii');
-        os.mkdir('VSHARP')
+        os.mkdir('VSHARP') if not os.path.exists("./VSHARP") else None
         nii = nib.Nifti1Image(lfs_vsharp, np.eye(4))
-        nib.save(nii, '\\VSHARP\\lfs_vsharp.nii.gz')
+        nib.save(nii, './VSHARP/lfs_vsharp.nii.gz')
         # % inversion of susceptibility
         # disp('--> TV susceptibility inversion on RESHARP...');
         # sus_vsharp = tvdi(lfs_vsharp,mask_vsharp,vox,tv_reg,mag(:,:,:,end),z_prjs,inv_num);
@@ -835,7 +840,7 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
         # nii = make_nii(sus_vsharp.*mask_vsharp,vox);
         # save_nii(nii,'VSHARP/sus_vsharp.nii');
         nii = nib.Nifti1Image(sus_vsharp * mask_vsharp, np.eye(4))
-        nib.save(nii, '\\VSHARP\\sus_vsharp.nii')
+        nib.save(nii, './VSHARP/sus_vsharp.nii')
 
     # % E-SHARP (SHARP edge extension)
     # if sum(strcmpi('esharp',bkg_rm))
@@ -903,9 +908,9 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
         # mkdir('ESHARP');
         # nii = make_nii(lfs_esharp,vox);
         # save_nii(nii,'ESHARP/lfs_esharp.nii');
-        os.mkdir('ESHARP')
+        os.mkdir('ESHARP') if not os.path.exists("./ESHARP") else None
         nii = nib.Nifti1Image(lfs_esharp, np.eye(4))
-        nib.save(nii, '\\ESHARP\\lfs_esharp.nii.gz')
+        nib.save(nii, './ESHARP/lfs_esharp.nii.gz')
 
         # % inversion of susceptibility
         # disp('--> TV susceptibility inversion on ESHARP...');
@@ -917,7 +922,7 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
         # nii = make_nii(sus_esharp.*mask_esharp,vox);
         # save_nii(nii,'ESHARP/sus_esharp.nii');
         nii = nib.Nifti1Image(sus_esharp * mask_esharp, np.eye(4))
-        nib.save(nii, '\\ESHARP\\sus_esharp.nii')
+        nib.save(nii, './ESHARP/sus_esharp.nii')
     # end
 
     # % LBV
@@ -941,9 +946,9 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
         # mkdir('LBV');
         # nii = make_nii(lfs_lbv,vox);
         # save_nii(nii,'LBV/lfs_lbv.nii');
-        os.mkdir('LBV')
+        os.mkdir('LBV') if not os.path.exists("./LBV") else None
         nii = nib.Nifti1Image(lfs_lbv, np.eye(4))
-        nib.save(nii, '\\LBV\\lfs_lbv.nii')
+        nib.save(nii, './LBV/lfs_lbv.nii')
 
         # % inversion of susceptibility
         # disp('--> TV susceptibility inversion on LBV...');
@@ -954,7 +959,7 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
         # save_nii(nii,['LBV/chi_iLSQR_smvrad' num2str(smv_rad) '.nii']);
         chi_iLSQR = QSM_iLSQR(lfs_lbv * (2.675e8 * dicom_info.MagneticFieldStrength) / 1e6, mask_lbv, 'H', z_prjs, 'voxelsize', vox, 'niter', 50, 'TE', 1000, 'B0', dicom_info.MagneticFieldStrength)
         nii = nib.Nifti1Image(chi_iLSQR, np.eye(4))
-        nib.save(nii, '\\LBV\\chi_iLSQR_smvrad' + str(smv_rad) + '.nii')
+        nib.save(nii, './LBV/chi_iLSQR_smvrad' + str(smv_rad) + '.nii')
 
         # % MEDI
         # ### normalize signal intensity by noise to get SNR %%%
@@ -1004,6 +1009,8 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
 
 
 if __name__ == "__main__":
-    path_mag = '../../DICOMs/swi_1mm_5TE_prisma4_r3_6'
-    path_ph = '../../DICOMs/swi_1mm_5TE_prisma4_r3_7'
+    path_mag = '../../Source/DICOMs/swi_1mm_5TE_prisma4_r3_6'
+    path_ph = '../../Source/DICOMs/swi_1mm_5TE_prisma4_r3_7'
+    path_mag = os.path.abspath(path_mag)
+    path_ph = os.path.abspath(path_ph)
     qsm_r2s_prisma(path_mag, path_ph)

@@ -9,6 +9,12 @@ from Transfer_Tools.numpy_over_write import padarray, circshift, nd_grid, ma_ran
 # 密集矩阵求解
 from tools.CallBackTools import CallBackTool
 
+# import Misc.nii
+#
+#
+# a = Misc.nii.initialize()
+# b = a
+
 
 def resharp(tfs, mask, vox=None, ker_rad=3, tik_reg=1e-4, iter_num=200):
     """
@@ -180,7 +186,7 @@ def resharp(tfs, mask, vox=None, ker_rad=3, tik_reg=1e-4, iter_num=200):
     print("resharp 函数结束。")
     # img = nibabel.Nifti1Image(lfs, 0)
     # nibabel.save(img, "lfs")
-    savemat("./Source_and_output/lfs.mat", {"lfs": lfs})
+    # savemat("./Source_and_output/lfs.mat", {"lfs": lfs})
     return [lfs, mask_ero, res_term, reg_term]
 
 

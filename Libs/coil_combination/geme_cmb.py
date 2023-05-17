@@ -39,7 +39,13 @@ def geme_cmb(img, vox, te, mask=None, smooth_method='gaussian', parpoll_flag=0):
     # TE1 = te(1);
     # TE2 = te(2);
     # imsize = size(img);
-    ne, nrcvrs = img.shape[3:5]
+    # matlab中，如果index超出原本的维度，则自动补维度，所以这里需要额外补充
+    try:
+        ne, nrcvrs = img.shape[3:5]
+    except ValueError:
+        img = np.expand_dims(img, axis=4)
+        ne = img.shape[3]
+        nrcvrs = 1
     TE1 = te[0]
     TE2 = te[1]
     imsize = img.shape
@@ -49,9 +55,12 @@ def geme_cmb(img, vox, te, mask=None, smooth_method='gaussian', parpoll_flag=0):
     # ph_diff_cmb = sum(abs(img(:,:,:,1,:)).*ph_diff,5);
     # ph_diff_cmb(isnan(ph_diff_cmb)) = 0;
     img_diff = img[:, :, :, 1, :] / img[:, :, :, 0, :]
+    if len(np.shape(img_diff)) == 4:
+        img_diff = np.expand_dims(img_diff, 4)
     ph_diff = img_diff / np.abs(img_diff)
-    ph_diff_cmb = np.sum(np.abs(img[:, :, :, 0, :]) * ph_diff, 4)
+    ph_diff_cmb = np.sum(np.expand_dims(np.abs(img[:, :, :, 0, :]), 4) * ph_diff, axis=4)
     ph_diff_cmb[np.isnan(ph_diff_cmb)] = 0
+
 
     # TODO 从这里开始就出问题了，源代码是直接用cd更换了目录，但是函数中不知道外接切换的目录。
     # nii = make_nii(angle(ph_diff_cmb),vox);
@@ -71,17 +80,19 @@ def geme_cmb(img, vox, te, mask=None, smooth_method='gaussian', parpoll_flag=0):
     # mask_input = mask;
     # mask = (mag1 > 0.1*median(mag1(logical(mask(:)))));
     # mask = mask | mask_input;
-    mag1 = np.sqrt(np.sum(np.abs(img[:, :, :, 0, :] ** 2), 4))
+    mag1 = np.sqrt(np.sum(np.expand_dims(np.abs(img[:, :, :, 0, :] ** 2), 4), axis=4))
+
     mask_input = mask
+    mask_input = np.expand_dims(mask_input, -1)
     mask = (mag1 > 0.1 * np.median(mag1[mask.astype(bool)]))
-    mask = mask | mask_input
+    mask = mask | mask_input.astype(bool)
 
     # % method (2)
     # % best path unwrapping
     # [pathstr, ~, ~] = fileparts(which('3DSRNCP.m'));
     # 寻找3DSRNCP的路径，这里默认文件结构固定，以Libs文件夹为分界线。
     pathstr = os.path.abspath(os.path.dirname(__file__)).split('Libs')[0]
-    pathstr = os.path.join(pathstr, 'Libs', 'phase_unwrapping', '3DSRNCP')
+    pathstr = os.path.join(pathstr, 'Libs', 'phase_unwrapping')
     # setenv('pathstr',pathstr);
     # setenv('nv',num2str(imsize(1)));
     # setenv('np',num2str(imsize(2)));
@@ -125,10 +136,12 @@ def geme_cmb(img, vox, te, mask=None, smooth_method='gaussian', parpoll_flag=0):
     # fid = fopen('unwrapped_phase_diff.dat','r');
     # tmp = fread(fid,'float');
     tmp = np.fromfile('unwrapped_phase_diff.dat', dtype=np.float32)
+    tmp = np.reshape(tmp, imsize[0:3])
     # unph_diff_cmb = reshape(tmp - round(mean(tmp(mask==1))/(2*pi))*2*pi ,imsize(1:3)).*mask;
+
     unph_diff_cmb = np.reshape(
-        tmp - np.round(np.mean(tmp[mask.astype(bool)]) / (2 * np.pi)) * 2 * np.pi, imsize[0:3]
-    ) * mask
+        tmp - np.round(np.mean(tmp[np.reshape(mask, imsize[0:3]).astype(bool)]) / (2 * np.pi)) * 2 * np.pi, imsize[0:3]
+    ) * np.reshape(mask, imsize[0:3])
 
     # nii = make_nii(unph_diff_cmb,vox);
     # save_nii(nii,'unph_diff.nii');
@@ -139,7 +152,11 @@ def geme_cmb(img, vox, te, mask=None, smooth_method='gaussian', parpoll_flag=0):
     # unph_te1_cmb = unph_diff_cmb*TE1/(TE2-TE1);
     unph_diff_cmb = unph_diff_cmb * TE1 / (TE2 - TE1)
     # offsets = img(:,:,:,1,:)./exp(1j*unph_te1_cmb);
-    offsets = img[:, :, :, 0, :] / np.exp(1j * unph_diff_cmb)
+
+    offsets = np.reshape(img[:, :, :, 0, :], imsize[0:3]) / np.exp(1j * unph_diff_cmb)
+    offsets = np.expand_dims(offsets, 3)
+    offsets = np.expand_dims(offsets, 4)
+
     # offsets = offsets./abs(offsets); % complex phase offset
     offsets = offsets / np.abs(offsets)  # complex phase offset
     # offsets(isnan(offsets)) = 0;
@@ -170,6 +187,7 @@ def geme_cmb(img, vox, te, mask=None, smooth_method='gaussian', parpoll_flag=0):
     #       offsets(:,:,:,1,chan) = imgaussfilt3(real(offsets(:,:,:,1,chan)),6) + 1j*imgaussfilt3(imag(offsets(:,:,:,1,chan)),6);
     #       offsets(:,:,:,1,chan) = offsets(:,:,:,1,chan)./abs(offsets(:,:,:,1,chan));
     #   end
+    # 这里又是matlab自动补维度。
     elif smooth_method.lower() == "gaussian":
         for chan in range(nrcvrs):
             offsets[:, :, :, 0, chan] = (ndimage.gaussian_filter(np.real(offsets[:, :, :, 0, chan]), sigma=6) +
@@ -205,13 +223,13 @@ def geme_cmb(img, vox, te, mask=None, smooth_method='gaussian', parpoll_flag=0):
             os.environ['chan'] = str(chan)
             # 运行3DSRNCP
             bash_script = (pathstr + f'/3DSRNCP wrapped_offsets_chan{str(chan)}.dat mask_unwrp.dat '
-                                          f'unwrapped_offsets_chan{str(chan)}.dat $nv $np $ns reliability_diff.dat')
+                           f'unwrapped_offsets_chan{str(chan)}.dat $nv $np $ns reliability_diff.dat')
             # unix(bash_script)
             subprocess.run(bash_script, shell=True)
 
             # TODO 读取unwrapped_offsets_chan${chan}.dat
             with open(f'unwrapped_offsets_chan{str(chan)}.dat', 'rb') as fid:
-                tmp = np.fromfile(fid, dtype='float32')
+                tmp = np.reshape(np.fromfile(fid, dtype='float32'))
             tmp = np.reshape(tmp - np.round(np.mean(tmp[mask == 1]) / (2 * np.pi)) * 2 * np.pi, imsize[0:3])
             unph_offsets[..., chan] = tmp * mask
             offsets[..., chan] = poly3d(unph_offsets[..., chan], mask, 3)
@@ -225,7 +243,7 @@ def geme_cmb(img, vox, te, mask=None, smooth_method='gaussian', parpoll_flag=0):
     #     end
     elif smooth_method.lower() == 'poly3_nlcg':
         for chan in range(nrcvrs):
-            offsets[..., chan] = poly3d_nonlinear(offsets[..., chan], mask, 3)
+            offsets[:, :, :, :, chan] = poly3d_nonlinear(offsets[:, :, :, :, chan], mask, 3)
     # else
     #     error('what method to use for smoothing? smooth3 or poly3 or poly3_nlcg')
     # end
@@ -258,7 +276,9 @@ def geme_cmb(img, vox, te, mask=None, smooth_method='gaussian', parpoll_flag=0):
     # sen(isinf(sen)) = 0;
     # nii = make_nii(sen,vox);
     # save_nii(nii,'sen_mag_raw.nii');
-    sen = np.squeeze(np.abs(img[..., 0, :])) / mag_cmb[..., 0]
+
+    sen = np.squeeze(np.abs(img[:, :, :, 0, :])) / mag_cmb[:, :, :, 0]
+
     sen[np.isnan(sen)] = 0
     sen[np.isinf(sen)] = 0
     nii = nib.Nifti1Image(sen, np.eye(4))
@@ -282,3 +302,5 @@ def geme_cmb(img, vox, te, mask=None, smooth_method='gaussian', parpoll_flag=0):
 
     # coil_sens = sen.*squeeze(offsets);
     coil_sens = sen * np.squeeze(offsets)
+
+    return ph_cmb, mag_cmb, coil_sens
