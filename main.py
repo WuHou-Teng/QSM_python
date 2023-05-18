@@ -1,8 +1,10 @@
+import os
 import sys
 import socket
 from socket import SOL_SOCKET, SO_REUSEADDR
 from PyQt5.QtWidgets import QMainWindow, QApplication, QStyleFactory
 from Panel.MainPanel import Ui_MainWindow
+from Libs.Siemens_3T.qsm_r2s_prisma import qsm_r2s_prisma
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -15,6 +17,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             # 删除相应的库
             self.Data_source_selection.takeItem(5)
             self.Data_source_pages.removeWidget(self.Siemens3T_P)
+
+        # 绑定按键和函数
+        self.Process_btn_3T_r2s.clicked.connect(self.Siemens_3T_r2s)
+
+    def Siemens_3T_r2s(self):
+        path_mag = './DICOMs/swi_1mm_5TE_prisma4_r3_6'
+        path_ph = './DICOMs/swi_1mm_5TE_prisma4_r3_7'
+        path_mag = os.path.abspath(path_mag)
+        path_ph = os.path.abspath(path_ph)
+        qsm_r2s_prisma(path_mag, path_ph)
 
     def connect_server(self):
         sk = socket.socket()

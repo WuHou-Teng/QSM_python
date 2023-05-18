@@ -1,5 +1,5 @@
 function qsm_epi47(path_in, path_out, options)
-%QSM_EPI47 Quantitative susceptibility mapping from EPI (Corey's) at 4.7T.
+% QSM_EPI47 Quantitative susceptibility mapping from EPI (Corey,s) at 4.7T.
 %   QSM_EPI47(PATH_IN, PATH_OUT, OPTIONS) reconstructs susceptibility maps.
 %
 %   Re-define the following default settings if necessary

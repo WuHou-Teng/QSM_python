@@ -1013,6 +1013,7 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
     os.chdir(init_dir)
 
 
+
 if __name__ == "__main__":
     path_mag = '../../Source/DICOMs/swi_1mm_5TE_prisma4_r3_6'
     path_ph = '../../Source/DICOMs/swi_1mm_5TE_prisma4_r3_7'
