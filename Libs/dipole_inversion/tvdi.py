@@ -116,8 +116,8 @@ def tvdi(lfs, mask, vox, tv_reg, weights, z_prjs=None, Itnlim=None, pNorm=None):
     res = lfs - np.real(np.fft.ifftn(D * np.fft.fftn(sus)))
 
     # remove the extra padding slices
-    sus = sus[:, :, 20:-1-20]
-    res = res[:, :, 20:-1-20]
+    sus = sus[:, :, 20:-1-19]
+    res = res[:, :, 20:-1-19]
     return sus, res
 
 

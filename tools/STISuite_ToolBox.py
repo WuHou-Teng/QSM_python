@@ -21,11 +21,11 @@ def QSM_iLSQR_eng(lfs_resharp, mask_resharp, z_prjs, vox, niter, TE, B0):
     # 首先，保存文件到临时文件夹
     # 首先获取绝对路径
     root = os.path.dirname(os.path.abspath(__file__)).split("QSM_python")[0]
-    current_dir = os.path.join(root, "QSM_python", "tools", "STISuite_V3.0", "STISuiteTools_pack_for_engine")
+    current_dir = os.path.join(root, "QSM_python", "tools", "STISuite_V3_0", "STISuiteTools_pack_for_engine")
     # 启动engine
     eng = matlab.engine.start_matlab()
     eng.addpath(current_dir, nargout=0)
-    eng.addpath(current_dir + "../STISuite_V3.0/Core_Functions_P", nargout=0)
+    eng.addpath(current_dir + "/../STISuite_V3_0/Core_Functions_P", nargout=0)
     # 创建临时文件夹Temp
     temp_dir = os.path.join(current_dir, "Temp")
     if not os.path.exists(temp_dir):
@@ -37,11 +37,14 @@ def QSM_iLSQR_eng(lfs_resharp, mask_resharp, z_prjs, vox, niter, TE, B0):
     savemat(mask_resharp_path, {"mask_resharp": mask_resharp})
 
     # 准备matlab调用指令
-    cmd = f"QSM_iLSQR_eng('{lfs_resharp_path}','{mask_resharp_path}',{z_prjs},{vox},{niter},{TE},{B0})"
+    # 'H', z_prjs, 'voxelsize', vox, 'niter', 50, 'TE', 1000, 'B0',
+    # cmd = (f"QSM_iLSQR_eng('{lfs_resharp_path}','{mask_resharp_path}', "
+    #        f"'H',{z_prjs}, 'voxelsize',{vox}, 'niter',{niter}, 'TE',{TE}, 'B0',{B0})")
+    cmd = (f"QSM_iLSQR_eng('{lfs_resharp_path}','{mask_resharp_path}', {z_prjs}, {vox}, {niter}, {TE}, {B0})")
     # 调用
     eng.eval(cmd, nargout=0)
     eng.quit()
-    return os.path.join(temp_dir, "QSM_iLSQR.mat")
+    return os.path.join(temp_dir, "chi_iLSQR.mat")
 
 
 

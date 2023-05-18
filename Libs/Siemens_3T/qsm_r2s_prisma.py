@@ -153,7 +153,7 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
         options.tik_reg = 1e-3
 
     if not options.is_field('cgs_num'):
-        options.cgs_num = 500
+        options.cgs_num = 20
 
     if not options.is_field('lbv_tol'):
         options.lbv_tol = 0.01
@@ -779,7 +779,7 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
         # % % 3D 2nd order polyfit to remove any residual background
         # % lfs_resharp= poly3d(lfs_resharp,mask_resharp);
         print('--> RESHARP to remove background field ...')
-        lfs_resharp, mask_resharp = resharp(tfs, mask * R, vox, smv_rad, tik_reg, cgs_num)
+        lfs_resharp, mask_resharp, _, _ = resharp(tfs, mask * R, vox, smv_rad, tik_reg, cgs_num)
 
         # % save nifti
         # mkdir('RESHARP');
@@ -799,10 +799,9 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
         niter = 50
         TE = 1000
         # QSM_iLSQR_eng 函数返回保存的文件地址，需要手动读取。
-        chi_iLSQR = loadmat(
-            QSM_iLSQR_eng(lfs_resharp * (2.675e8 * dicom_info.MagneticFieldStrength) / 1e6,
-                          mask_resharp, z_prjs, vox, niter, TE, dicom_info.MagneticFieldStrength,)
-        )
+        chi_iLSQR_address = QSM_iLSQR_eng(lfs_resharp * (2.675e8 * dicom_info.MagneticFieldStrength) / 1e6,
+                                          mask_resharp, z_prjs, vox, niter, TE, dicom_info.MagneticFieldStrength)
+        chi_iLSQR = loadmat(chi_iLSQR_address)["chi_iLSQR"]
         nii = nib.Nifti1Image(chi_iLSQR, np.eye(4))
         nib.save(nii, './RESHARP/chi_iLSQR_smvrad' + str(smv_rad) + '.nii')
 
@@ -814,7 +813,7 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
         # sus_resharp = tvdi(lfs_resharp,mask_resharp,vox,tv_reg,mag(:,:,:,end),z_prjs,inv_num);
         # nii = make_nii(sus_resharp.*mask_resharp,vox);
         # save_nii(nii,'RESHARP/sus_resharp.nii');
-        sus_resharp = tvdi(lfs_resharp, mask_resharp, vox, tv_reg, mag[..., -1], z_prjs, inv_num)
+        sus_resharp, _ = tvdi(lfs_resharp, mask_resharp, vox, tv_reg, mag[..., -1], z_prjs, inv_num)
         nii = nib.Nifti1Image(sus_resharp * mask_resharp, np.eye(4))
         nib.save(nii, './RESHARP/sus_resharp.nii')
 
@@ -1010,7 +1009,7 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
     # save('all.mat','-v7.3');
     # cd(init_dir);
     # TODO 保存所有参数，具体未知
-    savemat('all.mat', {'lfs_lbv': lfs_lbv, 'mask_lbv': mask_lbv, 'chi_iLSQR': chi_iLSQR})
+    # savemat('all.mat', {'lfs_lbv': lfs_lbv, 'mask_lbv': mask_lbv, 'chi_iLSQR': chi_iLSQR})
     os.chdir(init_dir)
 
 
