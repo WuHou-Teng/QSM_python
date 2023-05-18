@@ -17,6 +17,7 @@ from Libs.coil_combination.geme_cmb import geme_cmb
 from Libs.dipole_inversion.tikhonov_qsm import tikhonov_qsm
 from Libs.dipole_inversion.tvdi import tvdi
 from tools.Exception_Def import ParamException
+from tools.STISuite_ToolBox import QSM_iLSQR_eng
 from tools.StructureCLass import Options, Param
 from Transfer_Tools.numpy_over_write import padarray
 from Libs.Misc.NIFTI_python.nifti_base import make_save_nii_engine
@@ -795,8 +796,13 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
         # nii = make_nii(chi_iLSQR,vox);
         # save_nii(nii,['RESHARP/chi_iLSQR_smvrad' num2str(smv_rad) '.nii']);
         print('--> TV susceptibility inversion on RESHARP...')
-        # TODO 找不到QSM_iLSQR函数
-        chi_iLSQR = QSM_iLSQR(lfs_resharp * (2.675e8 * dicom_info.MagneticFieldStrength) / 1e6, mask_resharp, 'H', z_prjs, 'voxelsize', vox, 'niter', 50, 'TE', 1000, 'B0', dicom_info.MagneticFieldStrength)
+        niter = 50
+        TE = 1000
+        # QSM_iLSQR_eng 函数返回保存的文件地址，需要手动读取。
+        chi_iLSQR = loadmat(
+            QSM_iLSQR_eng(lfs_resharp * (2.675e8 * dicom_info.MagneticFieldStrength) / 1e6,
+                          mask_resharp, z_prjs, vox, niter, TE, dicom_info.MagneticFieldStrength,)
+        )
         nii = nib.Nifti1Image(chi_iLSQR, np.eye(4))
         nib.save(nii, './RESHARP/chi_iLSQR_smvrad' + str(smv_rad) + '.nii')
 
