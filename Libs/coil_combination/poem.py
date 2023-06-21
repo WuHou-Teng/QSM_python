@@ -4,6 +4,8 @@ import subprocess
 
 import numpy as np
 from scipy import ndimage
+from scipy.io import loadmat, savemat
+
 from Libs.Misc.NIFTI_python.nifti_base import make_save_nii_engine
 from Libs.background_field_removal.poly3d import poly3d
 from Libs.background_field_removal.poly3d_nonlinear import poly3d_nonlinear
@@ -120,6 +122,7 @@ def poem(mag, pha, vox, te, mask=None, smooth_method=None, parpool_flag=None):
         np.array(np.angle(ph_diff_cmb), dtype=np.float32).tofile(fid)
         # for val in np.angle(ph_diff_cmb).flatten():
         #     fid.write(struct.pack('f', val))
+    # savemat("wrapped_phase_diff.dat", {"wrapped_phase_diff": ph_diff_cmb})
 
     del ph_diff_cmb
 
@@ -152,6 +155,8 @@ def poem(mag, pha, vox, te, mask=None, smooth_method=None, parpool_flag=None):
     # TODO 不确定这里的读取是否正确
     with open('unwrapped_phase_diff.dat', 'rb') as fid:
         tmp = np.fromfile(fid, dtype=np.float32)
+    # tmp = loadmat("unwrapped_phase_diff.dat")
+    # tmp = tmp[list(tmp.keys())[0]]
 
     # unph_diff_cmb = reshape(tmp - round(mean(tmp(mask==1))/(2*pi))*2*pi ,imsize(1:3)).*mask
     unph_diff_cmb = np.reshape(
@@ -263,6 +268,10 @@ def poem(mag, pha, vox, te, mask=None, smooth_method=None, parpool_flag=None):
             with open(f'unwrapped_offsets_chan{str(chan)}.dat', 'rb') as fid:
                 tmp = np.fromfile(fid, dtype='float32')
             tmp = np.reshape(tmp - np.round(np.mean(tmp[mask == 1]) / (2 * np.pi)) * 2 * np.pi, imsize[0:3])
+            # tmp = loadmat(f"unwrapped_offsets_chan{str(chan)}.dat")
+            # tmp = tmp[list(tmp.keys())[0]]
+            # tmp = np.reshape(tmp - np.round(np.mean(tmp[mask == 1]) / (2 * np.pi)) * 2 * np.pi, imsize[0:3])
+
             unph_offsets[..., chan] = tmp * mask
             offsets[..., chan] = poly3d(unph_offsets[..., chan], mask, 3)
 

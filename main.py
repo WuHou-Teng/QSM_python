@@ -22,8 +22,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.Process_btn_3T_r2s.clicked.connect(self.Siemens_3T_r2s)
 
     def Siemens_3T_r2s(self):
-        path_mag = './DICOMs/swi_1mm_5TE_prisma4_r3_6'
-        path_ph = './DICOMs/swi_1mm_5TE_prisma4_r3_7'
+        path_mag = './Source/DICOMs/swi_1mm_5TE_prisma4_r3_6'
+        path_ph = './Source/DICOMs/swi_1mm_5TE_prisma4_r3_7'
         path_mag = os.path.abspath(path_mag)
         path_ph = os.path.abspath(path_ph)
         qsm_r2s_prisma(path_mag, path_ph)

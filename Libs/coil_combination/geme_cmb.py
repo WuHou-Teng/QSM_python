@@ -5,7 +5,7 @@ import nibabel as nib
 import os
 
 from scipy import ndimage
-
+from scipy.io import savemat, loadmat
 from Libs.background_field_removal.poly3d import poly3d
 from Libs.background_field_removal.poly3d_nonlinear import poly3d_nonlinear
 
@@ -60,7 +60,6 @@ def geme_cmb(img, vox, te, mask=None, smooth_method='gaussian', parpoll_flag=0):
     ph_diff = img_diff / np.abs(img_diff)
     ph_diff_cmb = np.sum(np.expand_dims(np.abs(img[:, :, :, 0, :]), 4) * ph_diff, axis=4)
     ph_diff_cmb[np.isnan(ph_diff_cmb)] = 0
-
 
     # TODO 从这里开始就出问题了，源代码是直接用cd更换了目录，但是函数中不知道外接切换的目录。
     # nii = make_nii(angle(ph_diff_cmb),vox);

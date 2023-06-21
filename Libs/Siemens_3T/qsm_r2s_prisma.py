@@ -153,7 +153,7 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
         options.tik_reg = 1e-3
 
     if not options.is_field('cgs_num'):
-        options.cgs_num = 20
+        options.cgs_num = 500
 
     if not options.is_field('lbv_tol'):
         options.lbv_tol = 0.01
@@ -165,7 +165,7 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
         options.tv_reg = 5e-4
 
     if not options.is_field('inv_num'):
-        options.inv_num = 20
+        options.inv_num = 500
 
     if not options.is_field('interp'):
         options.interp = 0
@@ -371,6 +371,7 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
     # % if unipolar
     # if strcmpi('unipolar',readout)
     #     ph_corr = geme_cmb(mag.*exp(1j*ph),vox,TE,mask);
+    # TODO ph
     if readout.lower() == 'unipolar':
         ph_corr = geme_cmb(mag * np.exp(1j * ph), vox, TE, mask)[0]
     # % if bipolar
@@ -562,6 +563,7 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
     # disp('--> magnitude weighted LS fit of phase to TE ...');
     # [tfs, fit_residual] = echofit(unph,mag,TE,0);
     print('--> magnitude weighted LS fit of phase to TE ...')
+    # TODO 这里ehofit输出的tfs直接就是空的
     tfs, fit_residual, _ = echofit(unph, mag, TE, 0)
 
     # % extra filtering according to fitting residuals
@@ -670,7 +672,7 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
         P = maskR + 30 * (1 - maskR)
         chi_ero0_500 = tikhonov_qsm(tfs, Res_wt * maskR, 1, maskR, maskR, 0, 1e-4, 0.001, 0, vox, P, z_prjs, 500)
         nii = nib.Nifti1Image(chi_ero0_500 * maskR, np.eye(4))
-        nib.save(nii, './LN-QSM/chi_ero0_tik_1e-3_tv_1e-4_500.nii.gz')
+        nib.save(nii, './LN-QSM/chi_ero0_tik_1e-3_tv_1e-4_500.nii')
 
         # % (2) erode 1 voxel from brain edge
         # P = mask_ero1 + 30*(1 - mask_ero1);
@@ -682,7 +684,7 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
         chi_ero1_500 = tikhonov_qsm(tfs, Res_wt * mask_ero1, 1, mask_ero1, mask_ero1, 0, 1e-4, 0.001, 0, vox, P, z_prjs,
                                     500)
         nii = nib.Nifti1Image(chi_ero1_500 * mask_ero1, np.eye(4))
-        nib.save(nii, './LN-QSM/chi_ero1_tik_1e-3_tv_1e-4_500.nii.gz')
+        nib.save(nii, './LN-QSM/chi_ero1_tik_1e-3_tv_1e-4_500.nii')
 
         # % (3) erode 2 voxel from brain edge
         # P = mask_ero2 + 30*(1 - mask_ero2);
@@ -694,7 +696,7 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
         chi_ero2_500 = tikhonov_qsm(tfs, Res_wt * mask_ero2, 1, mask_ero2, mask_ero2, 0, 1e-4, 0.001, 0, vox, P, z_prjs,
                                     500)
         nii = nib.Nifti1Image(chi_ero2_500 * mask_ero2, np.eye(4))
-        nib.save(nii, './LN-QSM/chi_ero2_tik_1e-3_tv_1e-4_500.nii.gz')
+        nib.save(nii, './LN-QSM/chi_ero2_tik_1e-3_tv_1e-4_500.nii')
 
         # % (4) erode 3 voxel from brain edge
         # P = mask_ero3 + 30*(1 - mask_ero3);
@@ -726,7 +728,7 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
         # nii = make_nii(lfs_pdf,vox);
         # save_nii(nii,'PDF/lfs_pdf.nii');
         nii = nib.Nifti1Image(lfs_pdf, np.eye(4))
-        nib.save(nii, './PDF/lfs_pdf.nii.gz')
+        nib.save(nii, './PDF/lfs_pdf.nii')
 
         # % inversion of susceptibility
         # disp('--> TV susceptibility inversion on PDF...');
@@ -738,7 +740,7 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
         # nii = make_nii(sus_pdf.*mask_pdf,vox);
         # save_nii(nii,'PDF/sus_pdf.nii');
         nii = nib.Nifti1Image(sus_pdf * mask_pdf, np.eye(4))
-        nib.save(nii, './PDF/sus_pdf.nii.gz')
+        nib.save(nii, './PDF/sus_pdf.nii')
 
     # % SHARP (t_svd: truncation threthold for t_svd)
     # if sum(strcmpi('sharp',bkg_rm))
@@ -756,7 +758,7 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
         # save_nii(nii,'SHARP/lfs_sharp.nii');
         os.mkdir('SHARP') if not os.path.exists("./SHARP") else None
         nii = nib.Nifti1Image(lfs_sharp, np.eye(4))
-        nib.save(nii, './SHARP/lfs_sharp.nii.gz')
+        nib.save(nii, './SHARP/lfs_sharp.nii')
 
         # % inversion of susceptibility
         # disp('--> TV susceptibility inversion on SHARP...');
@@ -769,7 +771,7 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
         # save_nii(nii,'SHARP/sus_sharp.nii');
         # TODO 这里 sus 和 res 形状不同导致报错，但目前不是重点。
         nii = nib.Nifti1Image(sus_sharp * mask_sharp, np.eye(4))
-        nib.save(nii, './SHARP/sus_sharp.nii.gz')
+        nib.save(nii, './SHARP/sus_sharp.nii')
 
     # % RE-SHARP (tik_reg: Tikhonov regularization parameter)
     # if sum(strcmpi('resharp',bkg_rm))
@@ -787,7 +789,7 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
         # save_nii(nii,'RESHARP/lfs_resharp.nii');
         os.mkdir('RESHARP') if not os.path.exists("./RESHARP") else None
         nii = nib.Nifti1Image(lfs_resharp, np.eye(4))
-        nib.save(nii, './RESHARP/lfs_resharp.nii.gz')
+        nib.save(nii, './RESHARP/lfs_resharp.nii')
 
         # % inversion of susceptibility
         # disp('--> TV susceptibility inversion on RESHARP...');
@@ -834,7 +836,7 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
         # save_nii(nii,'VSHARP/lfs_vsharp.nii');
         os.mkdir('VSHARP') if not os.path.exists("./VSHARP") else None
         nii = nib.Nifti1Image(lfs_vsharp, np.eye(4))
-        nib.save(nii, './VSHARP/lfs_vsharp.nii.gz')
+        nib.save(nii, './VSHARP/lfs_vsharp.nii')
         # % inversion of susceptibility
         # disp('--> TV susceptibility inversion on RESHARP...');
         # sus_vsharp = tvdi(lfs_vsharp,mask_vsharp,vox,tv_reg,mag(:,:,:,end),z_prjs,inv_num);
@@ -915,7 +917,7 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
         # save_nii(nii,'ESHARP/lfs_esharp.nii');
         os.mkdir('ESHARP') if not os.path.exists("./ESHARP") else None
         nii = nib.Nifti1Image(lfs_esharp, np.eye(4))
-        nib.save(nii, './ESHARP/lfs_esharp.nii.gz')
+        nib.save(nii, './ESHARP/lfs_esharp.nii')
 
         # % inversion of susceptibility
         # disp('--> TV susceptibility inversion on ESHARP...');
@@ -1013,10 +1015,12 @@ def qsm_r2s_prisma(path_mag=None, path_ph=None, path_out=None, options=None):
     os.chdir(init_dir)
 
 
-
 if __name__ == "__main__":
     path_mag = '../../Source/DICOMs/swi_1mm_5TE_prisma4_r3_6'
     path_ph = '../../Source/DICOMs/swi_1mm_5TE_prisma4_r3_7'
     path_mag = os.path.abspath(path_mag)
     path_ph = os.path.abspath(path_ph)
-    qsm_r2s_prisma(path_mag, path_ph)
+    option = Options()
+    option.inv_num = 20
+    option.cgs_num = 20
+    qsm_r2s_prisma(path_mag, path_ph, options=option)
